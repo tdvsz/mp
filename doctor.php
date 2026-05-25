@@ -117,7 +117,7 @@ $days = ['','Понедельник','Вторник','Среда','Четвер
     <div class="container header-flex">
         <a href="dashboard.php" class="logo">← В кабинет</a>
         <div style="display:flex; gap:10px;">
-            <a href="settings.php" class="btn btn-outline">⚙️ Настройки</a>
+            <a href="settings.php" class="btn btn-outline">Настройки</a>
             <a href="logout.php" class="btn btn-outline">Выйти</a>
         </div>
     </div>
@@ -126,7 +126,7 @@ $days = ['','Понедельник','Вторник','Среда','Четвер
 <main class="container">
     <!-- Форма редактирования профиля врача -->
 <div class="card" style="margin-bottom: 20px;">
-    <h3>👤 Мой профиль</h3>
+    <h3>Мой профиль</h3>
     <form method="POST">
         <label>Описание / О себе:</label>
         <textarea name="description" rows="3" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:6px; resize:vertical;"><?=htmlspecialchars($current_desc ?? '')?></textarea>
@@ -135,7 +135,7 @@ $days = ['','Понедельник','Вторник','Среда','Четвер
 </div>
 
 <?php if($msg): ?><div class="success"><?=htmlspecialchars($msg)?></div><?php endif; ?>
-    <h1>📅 Мое расписание</h1>
+    <h1>Мое расписание</h1>
     
     <?php if($msg): ?>
         <div class="success"><?=htmlspecialchars($msg)?></div>
@@ -143,7 +143,7 @@ $days = ['','Понедельник','Вторник','Среда','Четвер
     
     <!-- Форма добавления слота -->
     <div class="card">
-        <h3>➕ Добавить временной слот</h3>
+        <h3>Добавить временной слот</h3>
         <form method="POST" id="slotForm">
             <input type="hidden" name="edit_id" id="edit_id" value="">
             
@@ -199,14 +199,14 @@ $days = ['','Понедельник','Вторник','Среда','Четвер
             </div>
             
             <div style="margin-top:20px; display:flex; gap:10px;">
-                <button type="submit" name="add_slot" class="btn btn-primary">💾 Сохранить слот</button>
+                <button type="submit" name="add_slot" class="btn btn-primary">Сохранить слот</button>
                 <button type="button" class="btn btn-outline" onclick="resetForm()">Очистить</button>
             </div>
         </form>
     </div>
     
     <!-- Расписание по дням -->
-    <h2 style="margin:30px 0 20px;">📋 Текущее расписание</h2>
+    <h2 style="margin:30px 0 20px;">Текущее расписание</h2>
     
     <?php for($day=1; $day<=7; $day++): 
         $day_slots = array_filter($schedule_slots, fn($s) => $s['day_of_week'] == $day);
@@ -222,9 +222,9 @@ $days = ['','Понедельник','Вторник','Среда','Четвер
                     </div>
                     <div class="slot-info">
                         <?php if($slot['is_break']): ?>
-                            <span class="slot-badge break-badge">🍽 Перерыв</span>
+                            <span class="slot-badge break-badge">Перерыв</span>
                         <?php else: ?>
-                            <span class="slot-badge service-badge">🩺 <?=htmlspecialchars($slot['service_name'] ?? 'Без услуги')?></span>
+                            <span class="slot-badge service-badge"><?=htmlspecialchars($slot['service_name'] ?? 'Без услуги')?></span>
                             <?php if($slot['service_name'] && $slot['duration_minutes']): 
                                 $duration = strtotime($slot['end_time']) - strtotime($slot['start_time']);
                                 $slots_count = floor($duration / ($slot['duration_minutes'] * 60));

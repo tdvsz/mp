@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             
             <div class="settings-section" style="margin-top:30px; padding-top:30px; border-top:1px solid var(--border);">
-                <h3>🔒 Смена пароля</h3>
+                <h3>Смена пароля</h3>
                 <p style="font-size:0.9rem; color:#64748b; margin-bottom:15px;">Оставьте поля пустыми, если не хотите менять пароль</p>
                 
                 <div class="form-group">
@@ -143,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
             
-            <button type="submit" class="btn btn-primary btn-large" style="width:100%; margin-top:25px;">💾 Сохранить изменения</button>
+            <button type="submit" class="btn btn-primary btn-large" style="width:100%; margin-top:25px;">Сохранить изменения</button>
         </form>
     </div>
 </main>

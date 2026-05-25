@@ -6,6 +6,21 @@ $role = $_SESSION['role'];
 $user_id = $_SESSION['user_id'];
 $name = htmlspecialchars($_SESSION['full_name']);
 
+// === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ РУССКИХ ДАТ ===
+function ru_month($month_num) {
+    $months = [
+        1 => 'янв', 2 => 'фев', 3 => 'мар', 4 => 'апр',
+        5 => 'май', 6 => 'июн', 7 => 'июл', 8 => 'авг',
+        9 => 'сен', 10 => 'окт', 11 => 'ноя', 12 => 'дек'
+    ];
+    return $months[(int)$month_num] ?? '';
+}
+
+function format_date_ru($date) {
+    return $date ? date('d.m.Y', strtotime($date)) : '';
+}
+// ===============================================
+
 $success_msg = '';
 $err_msg = '';
 
@@ -145,11 +160,15 @@ if ($role === 'doctor') {
         <div class="info-box">У вас нет предстоящих записей. <a href="doctors.php" style="color:var(--primary); font-weight:600;">Записаться →</a></div>
     <?php else: ?>
         <div class="appointments-list">
-            <?php foreach($patient_upcoming as $ap): ?>
+            <?php foreach($patient_upcoming as $ap): 
+                $ap_ts = strtotime($ap['appointment_date']);
+                $ap_day = date('d', $ap_ts);
+                $ap_month_ru = ru_month(date('n', $ap_ts));
+            ?>
                 <div class="appointment-card upcoming">
                     <div class="ap-date">
-                        <div class="ap-day"><?=date('d', strtotime($ap['appointment_date']))?></div>
-                        <div class="ap-month"><?=date('M', strtotime($ap['appointment_date']))?></div>
+                        <div class="ap-day"><?=$ap_day?></div>
+                        <div class="ap-month"><?=$ap_month_ru?></div>
                     </div>
                     <div class="ap-info">
                         <h3><?=htmlspecialchars($ap['service_name'])?></h3>
@@ -210,7 +229,7 @@ if ($role === 'doctor') {
             <tr><th>Дата</th><th>Время</th><th>Услуга</th><th>Врач</th><th>Цена</th><th>Статус</th></tr>
             <?php foreach($patient_history as $ap): ?>
             <tr>
-                <td><?=$ap['appointment_date']?></td>
+                <td><?=format_date_ru($ap['appointment_date'])?></td>
                 <td><?=substr($ap['start_time'],0,5)?></td>
                 <td><?=htmlspecialchars($ap['service_name'])?></td>
                 <td><?=htmlspecialchars($ap['doctor_name'])?></td>
@@ -239,7 +258,7 @@ if ($role === 'doctor') {
     <!-- ================= ВРАЧ ================= -->
     <?php elseif($role === 'doctor'): ?>
     
-    <h2 style="margin:0 0 15px; color:#10b981;"> Приемы на сегодня</h2>
+    <h2 style="margin:0 0 15px; color:#10b981;">Приемы на сегодня</h2>
     <?php if(empty($doctor_today)): ?>
         <div class="info-box">На сегодня записей нет.</div>
     <?php else: ?>
@@ -277,7 +296,7 @@ if ($role === 'doctor') {
             <tr><th>Дата</th><th>Время</th><th>Пациент</th><th>Услуга</th><th>Действия</th></tr>
             <?php foreach($doctor_future as $ap): ?>
             <tr>
-                <td><?=$ap['appointment_date']?></td>
+                <td><?=format_date_ru($ap['appointment_date'])?></td>
                 <td><?=substr($ap['start_time'],0,5)?></td>
                 <td><?=htmlspecialchars($ap['patient_name'])?></td>
                 <td><?=htmlspecialchars($ap['service_name'])?></td>
@@ -353,9 +372,9 @@ if ($role === 'doctor') {
                         <?php if(!empty($pat['telegram_nick'])): ?>
                             <p class="tg-mini"><a href="https://t.me/<?=htmlspecialchars($pat['telegram_nick'])?>" target="_blank">@<?=htmlspecialchars($pat['telegram_nick'])?></a></p>
                         <?php endif; ?>
-                        <p class="pat-stats">Визитов: <?=$pat['visits_count']?> • Последний: <?=date('d.m.Y', strtotime($pat['last_visit']))?></p>
+                        <p class="pat-stats">Визитов: <?=$pat['visits_count']?> • Последний: <?=format_date_ru($pat['last_visit'])?></p>
                     </div>
-                    <a href="patient_history.php?patient_id=<?=$pat['id']?>" class="btn-history" style="margin-top:auto;"> История</a>
+                    <a href="patient_history.php?patient_id=<?=$pat['id']?>" class="btn-history" style="margin-top:auto;">История</a>
                 </div>
                 <?php endforeach; ?>
             </div>

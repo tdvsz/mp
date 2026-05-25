@@ -40,9 +40,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h2>Вход в систему</h2>
     <form method="POST">
         <input type="hidden" name="action" id="action" value="login">
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Пароль" required>
         <input type="text" name="full_name" id="name-field" placeholder="ФИО" style="display:none;">
+        <input type="email" name="email" placeholder="Номер телефона" required>
+        <input type="password" name="password" placeholder="Пароль" required>
         <button type="submit">Войти</button>
     </form>
     <p class="switch">Нет аккаунта? <a href="#" onclick="toggleAuth()">Зарегистрироваться</a></p>
