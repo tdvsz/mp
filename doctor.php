@@ -483,5 +483,6 @@ function editSlot(slot) {
     color: #fff;
 }
 </style>
+<?php require 'includes/toast.php'; ?>
 </body>
 </html>

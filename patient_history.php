@@ -237,5 +237,6 @@ $history = $stmt->fetchAll();
         border-radius: 6px;
     }
 </style>
+<?php require 'includes/toast.php'; ?>
 </body>
 </html>

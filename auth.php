@@ -56,4 +56,6 @@ function toggleAuth() {
     else { f.value = 'login'; n.style.display = 'none'; document.querySelector('button').textContent = 'Войти'; }
 }
 </script>
-</body></html>
+</body>
+<?php require 'includes/toast.php'; ?>
+</html>
