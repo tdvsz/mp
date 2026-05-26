@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect("book.php?doctor_id=$doctor_id&service_id=$srv&date=".urlencode($d)."&msg=ok");
     }
 }
-if (isset($_GET['msg']) && $_GET['msg'] === 'ok') $msg = '✅ Запись успешно подтверждена!';
+if (isset($_GET['msg']) && $_GET['msg'] === 'ok') $msg = 'Запись успешно подтверждена!';
 
 // 7. Календарь
 $months = [];
@@ -207,8 +207,6 @@ function build_calendar($pdo, $doc_id, $srv_id, $month_str, $active_date) {
 </header>
 
 <main class="container">
-    <?php if($msg): ?><div class="success"><?=htmlspecialchars($msg)?></div><?php endif; ?>
-    
     <div class="booking-layout">
         <aside class="doctor-sidebar">
     <div class="doctor-profile-card">
@@ -317,6 +315,74 @@ function selectDate(el) {
     document.getElementById('date').value = date;
     document.getElementById('filterForm').submit();
 }
+</script>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<!-- Toast Script -->
+<script>
+function showToast(message, type = 'success', title = null) {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    const icons = {
+        success: '✓',
+        error: '✕',
+        info: 'i',
+        warning: '!'
+    };
+    
+    const titles = {
+        success: 'Success',
+        error: 'Error',
+        info: 'Info',
+        warning: 'Warning'
+    };
+    
+    const messages = {
+        success: 'Your changes are saved successfully',
+        error: 'Error has occured while saving changes.',
+        info: 'New settings available on your account.',
+        warning: 'Username you have entered is invalid.'
+    };
+    
+    toast.innerHTML = `
+        <div class="toast-icon">${icons[type]}</div>
+        <div class="toast-content">
+            <div class="toast-title">${title || titles[type]}</div>
+            <div class="toast-message">${message || messages[type]}</div>
+        </div>
+        <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Автоудаление через 4 секунды
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.style.animation = 'fadeOut 0.4s ease forwards';
+            setTimeout(() => toast.remove(), 400);
+        }
+    }, 6000);
+}
+
+// Показ тостов из PHP-переменных
+<?php if(isset($msg) && $msg): ?>
+    showToast(<?=json_encode($msg)?>, 'success');
+<?php endif; ?>
+<?php if(isset($err) && $err): ?>
+    showToast(<?=json_encode($err)?>, 'error');
+<?php endif; ?>
+<?php if(isset($success_msg) && $success_msg): ?>
+    showToast(<?=json_encode($success_msg)?>, 'success');
+<?php endif; ?>
+<?php if(isset($err_msg) && $err_msg): ?>
+    showToast(<?=json_encode($err_msg)?>, 'error');
+<?php endif; ?>
 </script>
 </body>
 </html>
