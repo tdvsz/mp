@@ -396,9 +396,227 @@ if ($role === 'doctor') {
         <?php endif; ?>
     </div>
 
-    <?php elseif($role === 'admin'): ?>
-        <div class="info-box">Перейдите в <a href="admin.php" style="color:var(--primary); font-weight:600;">панель администратора</a> для управления системой.</div>
-    <?php endif; ?>
+    <?php elseif($role === 'admin'): 
+    // Статистика для дашборда
+    $stats = [
+        'total_patients' => $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'patient'")->fetchColumn(),
+        'total_doctors' => $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'doctor'")->fetchColumn(),
+        'appointments_today' => $pdo->query("SELECT COUNT(*) FROM appointments WHERE appointment_date = CURDATE()")->fetchColumn(),
+        'appointments_week' => $pdo->query("SELECT COUNT(*) FROM appointments WHERE appointment_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)")->fetchColumn(),
+        'revenue_month' => $pdo->query("SELECT COALESCE(SUM(price), 0) FROM appointments WHERE status = 'completed' AND MONTH(appointment_date) = MONTH(CURDATE())")->fetchColumn(),
+        'cancellation_rate' => $pdo->query("SELECT ROUND(COUNT(CASE WHEN status = 'cancelled' THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0), 1) FROM appointments WHERE MONTH(appointment_date) = MONTH(CURDATE())")->fetchColumn(),
+    ];
+
+    // Последние записи
+    $recent_appointments = $pdo->query("
+        SELECT a.*, p.full_name as patient_name, d.full_name as doctor_name, s.name as service_name
+        FROM appointments a
+        JOIN users p ON a.patient_id = p.id
+        JOIN users d ON a.doctor_id = d.id
+        JOIN services s ON a.service_id = s.id
+        ORDER BY a.created_at DESC
+        LIMIT 10
+    ")->fetchAll();
+
+    // Топ врачей
+    $top_doctors = $pdo->query("
+        SELECT d.full_name, COUNT(a.id) as appointment_count
+        FROM users d
+        LEFT JOIN appointments a ON d.id = a.doctor_id
+        WHERE d.role = 'doctor'
+        GROUP BY d.id
+        ORDER BY appointment_count DESC
+        LIMIT 5
+    ")->fetchAll();
+?>
+
+<!-- Статистика -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-value"><?=$stats['total_patients']?></div>
+        <div class="stat-label">Всего пациентов</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">👨‍⚕️</div>
+        <div class="stat-value"><?=$stats['total_doctors']?></div>
+        <div class="stat-label">Врачей</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-value"><?=$stats['appointments_today']?></div>
+        <div class="stat-label">Записей сегодня</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">📈</div>
+        <div class="stat-value"><?=$stats['appointments_week']?></div>
+        <div class="stat-label">Записей за неделю</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-value"><?=number_format($stats['revenue_month'], 0, ',', ' ')?> BUN</div>
+        <div class="stat-label">Доход за месяц</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">❌</div>
+        <div class="stat-value"><?=$stats['cancellation_rate'] ?? 0?>%</div>
+        <div class="stat-label">Отмен за месяц</div>
+    </div>
+</div>
+
+<!-- Быстрые действия -->
+<div class="quick-actions">
+    <a href="admin.php?tab=appointments" class="quick-action-btn">
+        <span class="quick-action-icon">📅</span>
+        <span class="quick-action-text">Управление записями</span>
+    </a>
+    <a href="admin.php?tab=doctors" class="quick-action-btn secondary">
+        <span class="quick-action-icon">👨‍⚕️</span>
+        <span class="quick-action-text">Врачи</span>
+    </a>
+    <a href="admin.php?tab=services" class="quick-action-btn tertiary">
+        <span class="quick-action-icon">🏥</span>
+        <span class="quick-action-text">Услуги</span>
+    </a>
+    <a href="admin.php?tab=patients" class="quick-action-btn quaternary">
+        <span class="quick-action-icon">👥</span>
+        <span class="quick-action-text">Пациенты</span>
+    </a>
+</div>
+
+<div class="dashboard-grid">
+    <!-- Последние записи -->
+    <div class="dashboard-card">
+        <h3>🕐 Последние записи</h3>
+        <?php if(empty($recent_appointments)): ?>
+            <p style="color: #64748b; text-align: center; padding: 20px;">Нет записей</p>
+        <?php else: ?>
+            <?php foreach($recent_appointments as $ap): ?>
+            <div class="list-item">
+                <div class="list-item-header">
+                    <span class="list-item-title"><?=htmlspecialchars($ap['patient_name'])?></span>
+                    <span class="badge <?=$ap['status']?>"><?=($ap['status'] === 'booked' ? 'Записан' : ($ap['status'] === 'completed' ? 'Завершен' : 'Отменен'))?></span>
+                </div>
+                <div class="list-item-meta">
+                    <?=htmlspecialchars($ap['doctor_name'])?> • <?=htmlspecialchars($ap['service_name'])?> • <?=date('d.m.Y H:i', strtotime($ap['appointment_date'] . ' ' . $ap['start_time']))?>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+
+    <!-- Топ врачей -->
+    <div class="dashboard-card">
+        <h3>🏆 Топ врачей по записям</h3>
+        <?php if(empty($top_doctors)): ?>
+            <p style="color: #64748b; text-align: center; padding: 20px;">Нет данных</p>
+        <?php else: ?>
+            <?php foreach($top_doctors as $doctor): ?>
+            <div class="list-item">
+                <div class="list-item-header">
+                    <span class="list-item-title"><?=htmlspecialchars($doctor['full_name'])?></span>
+                    <span style="background: var(--primary); color: #fff; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 600;"><?=$doctor['appointment_count']?> записей</span>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- График -->
+<div class="dashboard-card" style="margin-top: 20px;">
+    <h3>📈 Активность за последние 7 дней</h3>
+    <canvas id="activityChart" height="200"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Данные для графика
+<?php
+$chart_data = $pdo->query("
+    SELECT DATE(appointment_date) as date, COUNT(*) as count 
+    FROM appointments 
+    WHERE appointment_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+    GROUP BY DATE(appointment_date)
+    ORDER BY date
+")->fetchAll(PDO::FETCH_KEY_PAIR);
+
+$labels = json_encode(array_map(function($d) { return date('d.m', strtotime($d)); }, array_keys($chart_data)));
+$values = json_encode(array_values($chart_data));
+?>
+
+const ctx = document.getElementById('activityChart').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: <?=$labels?>,
+        datasets: [{
+            label: 'Количество записей',
+            data: <?=$values?>,
+            borderColor: '#2563eb',
+            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: '#2563eb',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { stepSize: 1 }
+            }
+        }
+    }
+});
+</script>
+
+<style>
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
+.stat-card { background: #fff; padding: 20px; border-radius: 12px; border: 1px solid var(--border); text-align: center; transition: transform 0.2s; }
+.stat-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.stat-icon { font-size: 2rem; margin-bottom: 10px; }
+.stat-value { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
+.stat-label { color: #64748b; font-size: 0.9rem; }
+
+.quick-actions { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 30px; }
+.quick-action-btn { flex: 1; min-width: 200px; padding: 20px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: #fff; border: none; border-radius: 10px; cursor: pointer; text-decoration: none; text-align: center; transition: transform 0.2s, box-shadow 0.2s; }
+.quick-action-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3); }
+.quick-action-btn.secondary { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+.quick-action-btn.tertiary { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+.quick-action-btn.quaternary { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+.quick-action-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
+.quick-action-text { font-weight: 600; font-size: 1rem; }
+
+.dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 25px; margin-bottom: 30px; }
+.dashboard-card { background: #fff; border-radius: 12px; border: 1px solid var(--border); padding: 25px; }
+.dashboard-card h3 { margin: 0 0 20px; color: var(--text); font-size: 1.2rem; border-bottom: 2px solid var(--border); padding-bottom: 15px; }
+.list-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.list-item:last-child { border-bottom: none; }
+.list-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.list-item-title { font-weight: 600; color: var(--text); }
+.list-item-meta { font-size: 0.85rem; color: #64748b; }
+.badge { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+.badge.booked { background: #dbeafe; color: #1e40af; }
+.badge.completed { background: #d1fae5; color: #047857; }
+.badge.cancelled { background: #fee2e2; color: #b91c1c; }
+
+@media(max-width: 768px) {
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .quick-actions { flex-direction: column; }
+}
+</style>
+
+<?php endif; ?>
 </main>
 
 <style>
