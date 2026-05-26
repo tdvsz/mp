@@ -54,5 +54,6 @@
 <footer class="site-footer">
     <div class="container">© 2026 Medprofi. Все права защищены. | г. Москва, ул. Примерная, 10</div>
 </footer>
+<?php require 'toast.php'; ?>
 </body>
 </html>

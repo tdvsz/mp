@@ -113,5 +113,6 @@ try {
         </div>
     <?php endif; ?>
 </main>
+<?php require 'toast.php'; ?>
 </body>
 </html>

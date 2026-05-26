@@ -47,8 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
     <p class="switch">Нет аккаунта? <a href="#" onclick="toggleAuth()">Зарегистрироваться</a></p>
 </div>
-<?php if($err): ?><div class="err container"><?=htmlspecialchars($err)?></div><?php endif; ?>
-<?php if($success): ?><div class="success container"><?=htmlspecialchars($success)?></div><?php endif; ?>
 <script>
 function toggleAuth() {
     const f = document.getElementById('action'), n = document.getElementById('name-field');
@@ -56,4 +54,6 @@ function toggleAuth() {
     else { f.value = 'login'; n.style.display = 'none'; document.querySelector('button').textContent = 'Войти'; }
 }
 </script>
-</body></html>
+</body>
+<?php require 'toast.php'; ?>
+</html>

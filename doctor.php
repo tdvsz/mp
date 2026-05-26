@@ -133,14 +133,7 @@ $days = ['','Понедельник','Вторник','Среда','Четвер
         <button type="submit" name="update_profile" class="btn btn-primary" style="margin-top:10px;">Сохранить описание</button>
     </form>
 </div>
-
-<?php if($msg): ?><div class="success"><?=htmlspecialchars($msg)?></div><?php endif; ?>
     <h1>Мое расписание</h1>
-    
-    <?php if($msg): ?>
-        <div class="success"><?=htmlspecialchars($msg)?></div>
-    <?php endif; ?>
-    
     <!-- Форма добавления слота -->
     <div class="card">
         <h3>Добавить временной слот</h3>
@@ -483,5 +476,6 @@ function editSlot(slot) {
     color: #fff;
 }
 </style>
+<?php require 'toast.php'; ?>
 </body>
 </html>
