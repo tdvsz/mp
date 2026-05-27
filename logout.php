@@ -1,1 +1,3 @@
-<?php require 'config.php'; session_destroy(); redirect('index.php'); ?>
+<?php require 'config.php';
+session_destroy();
+redirect('index.php');

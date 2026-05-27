@@ -6,8 +6,13 @@ $pdo = new PDO('mysql:host=localhost;dbname=clinic_app;charset=utf8mb4', 'root',
     PDO::ATTR_EMULATE_PREPARES   => false,
 ]);
 
-function redirect($url) { header("Location: $url"); exit; }
-function requireAuth($roles = []) {
+function redirect($url)
+{
+    header("Location: $url");
+    exit;
+}
+function requireAuth($roles = [])
+{
     if (!isset($_SESSION['user_id'])) redirect('auth.php');
     if ($roles && !in_array($_SESSION['role'], $roles)) redirect('index.php');
 }
@@ -20,7 +25,8 @@ define('UPLOAD_DIR', __DIR__ . '/uploads/');
  * @param string $old_photo_path Старый путь к фото (для удаления при замене)
  * @return string|bool Путь к новому фото или false при ошибке
  */
-function handlePhotoUpload($file, $old_photo_path = null) {
+function handlePhotoUpload($file, $old_photo_path = null)
+{
     if (empty($file) || $file['error'] !== UPLOAD_ERR_OK) {
         return false;
     }
@@ -54,4 +60,3 @@ function handlePhotoUpload($file, $old_photo_path = null) {
 
     return false;
 }
-?>

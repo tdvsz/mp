@@ -18,19 +18,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_email = trim($_POST['email']);
     $new_telegram = trim($_POST['telegram_nick']);
     $photo_filename = $user['photo']; // Оставляем старое по умолчанию
-if (!empty($_FILES['photo']['name'])) {
-    $uploaded = handlePhotoUpload($_FILES['photo'], $user['photo']);
-    if ($uploaded === false) {
-        $err = 'Ошибка при загрузке фото. Проверьте формат и размер.';
-    } else {
-        $photo_filename = $uploaded;
+    if (!empty($_FILES['photo']['name'])) {
+        $uploaded = handlePhotoUpload($_FILES['photo'], $user['photo']);
+        if ($uploaded === false) {
+            $err = 'Ошибка при загрузке фото. Проверьте формат и размер.';
+        } else {
+            $photo_filename = $uploaded;
+        }
     }
-}
-    
+
     $old_pass = $_POST['old_password'] ?? '';
     $new_pass = $_POST['new_password'] ?? '';
     $confirm_pass = $_POST['confirm_password'] ?? '';
-    
+
     // Валидация
     if (empty($new_name)) {
         $err = 'ФИО не может быть пустым';
@@ -46,7 +46,7 @@ if (!empty($_FILES['photo']['name'])) {
             // Формируем запрос обновления
             $update_fields = "full_name = ?, email = ?, telegram_nick = ?, photo = ?";
             $params = [$new_name, $new_email, $new_telegram, $photo_filename];
-            
+
             // Если указан новый пароль
             if (!empty($new_pass)) {
                 if (empty($old_pass)) {
@@ -62,15 +62,15 @@ if (!empty($_FILES['photo']['name'])) {
                     $params[] = password_hash($new_pass, PASSWORD_DEFAULT);
                 }
             }
-            
+
             if (empty($err)) {
                 $params[] = $user_id;
                 $pdo->prepare("UPDATE users SET $update_fields WHERE id = ?")->execute($params);
-                
+
                 // Обновляем сессию
                 $_SESSION['full_name'] = $new_name;
                 $msg = '✅ Профиль успешно обновлен!';
-                
+
                 // Перезагружаем данные
                 $stmt->execute([$user_id]);
                 $user = $stmt->fetch();
@@ -81,91 +81,119 @@ if (!empty($_FILES['photo']['name'])) {
 ?>
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <title>Настройки | Medprofi</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-<header class="site-header">
-    <div class="container header-flex">
-        <a href="dashboard.php" class="logo">← Кабинет</a>
-        <a href="logout.php" class="btn btn-outline">Выйти</a>
-    </div>
-</header>
-
-<main class="container" style="max-width:700px;">
-    <h1 style="margin-bottom:25px;">️ Настройки профиля</h1>
-    <div class="card">
-        <form method="POST" enctype="multipart/form-data">
-            <div class="settings-section">
-                <h3> Основная информация</h3>
-                
-                <div class="form-group">
-                    <label>ФИО:</label>
-                    <input type="text" name="full_name" value="<?=htmlspecialchars($user['full_name'])?>" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Email:</label>
-                    <input type="email" name="email" value="<?=htmlspecialchars($user['email'])?>" required>
-                </div>
-                
-                <?php if($role !== 'admin'): ?>
-                <div class="form-group">
-                    <label>Telegram ник (без @):</label>
-                    <input type="text" name="telegram_nick" value="<?=htmlspecialchars($user['telegram_nick'] ?? '')?>" placeholder="username">
-                </div>
-                <?php endif; ?>
-                
-                <div class="form-group">
-    <label>Фото профиля:</label>
-    <!-- Показываем текущее фото, если есть -->
-    <?php if(!empty($user['photo'])): ?>
-        <div style="margin-bottom: 10px;">
-            <img src="uploads/<?=htmlspecialchars($user['photo'])?>" 
-                 style="width:80px; height:80px; border-radius:50%; object-fit:cover;" 
-                 onerror="this.style.display='none'">
+    <header class="site-header">
+        <div class="container header-flex">
+            <a href="dashboard.php" class="logo">← Кабинет</a>
+            <a href="logout.php" class="btn btn-outline">Выйти</a>
         </div>
-    <?php endif; ?>
-    
-    <input type="file" name="photo" accept="image/*">
-    <small style="color: #64748b;">JPG, PNG, WebP (макс. 2MB)</small>
-</div>
-            </div>
-            
-            <div class="settings-section" style="margin-top:30px; padding-top:30px; border-top:1px solid var(--border);">
-                <h3>Смена пароля</h3>
-                <p style="font-size:0.9rem; color:#64748b; margin-bottom:15px;">Оставьте поля пустыми, если не хотите менять пароль</p>
-                
-                <div class="form-group">
-                    <label>Текущий пароль:</label>
-                    <input type="password" name="old_password" placeholder="Введите текущий пароль">
-                </div>
-                
-                <div class="form-group">
-                    <label>Новый пароль:</label>
-                    <input type="password" name="new_password" placeholder="Минимум 6 символов">
-                </div>
-                
-                <div class="form-group">
-                    <label>Подтвердите новый пароль:</label>
-                    <input type="password" name="confirm_password" placeholder="Повторите новый пароль">
-                </div>
-            </div>
-            
-            <button type="submit" class="btn btn-primary btn-large" style="width:100%; margin-top:25px;">Сохранить изменения</button>
-        </form>
-    </div>
-</main>
+    </header>
 
-<style>
-.settings-section h3 { margin:0 0 15px; color:#334155; }
-.form-group { margin-bottom:15px; }
-.form-group label { display:block; margin-bottom:5px; font-weight:500; color:#475569; font-size:0.9rem; }
-.form-group input { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:0.95rem; }
-.form-group input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(37,99,235,0.1); }
-</style>
-<?php require 'toast.php'; ?>
+    <main class="container" style="max-width:700px;">
+        <h1 style="margin-bottom:25px;">️ Настройки профиля</h1>
+        <div class="card">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="settings-section">
+                    <h3> Основная информация</h3>
+
+                    <div class="form-group">
+                        <label>ФИО:</label>
+                        <input type="text" name="full_name" value="<?= htmlspecialchars($user['full_name']) ?>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required>
+                    </div>
+
+                    <?php if ($role !== 'admin'): ?>
+                        <div class="form-group">
+                            <label>Telegram ник (без @):</label>
+                            <input type="text" name="telegram_nick" value="<?= htmlspecialchars($user['telegram_nick'] ?? '') ?>" placeholder="username">
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="form-group">
+                        <label>Фото профиля:</label>
+                        <!-- Показываем текущее фото, если есть -->
+                        <?php if (!empty($user['photo'])): ?>
+                            <div style="margin-bottom: 10px;">
+                                <img src="uploads/<?= htmlspecialchars($user['photo']) ?>"
+                                    style="width:80px; height:80px; border-radius:50%; object-fit:cover;"
+                                    onerror="this.style.display='none'">
+                            </div>
+                        <?php endif; ?>
+
+                        <input type="file" name="photo" accept="image/*">
+                        <small style="color: #64748b;">JPG, PNG, WebP (макс. 2MB)</small>
+                    </div>
+                </div>
+
+                <div class="settings-section" style="margin-top:30px; padding-top:30px; border-top:1px solid var(--border);">
+                    <h3>Смена пароля</h3>
+                    <p style="font-size:0.9rem; color:#64748b; margin-bottom:15px;">Оставьте поля пустыми, если не хотите менять пароль</p>
+
+                    <div class="form-group">
+                        <label>Текущий пароль:</label>
+                        <input type="password" name="old_password" placeholder="Введите текущий пароль">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Новый пароль:</label>
+                        <input type="password" name="new_password" placeholder="Минимум 6 символов">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Подтвердите новый пароль:</label>
+                        <input type="password" name="confirm_password" placeholder="Повторите новый пароль">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-large" style="width:100%; margin-top:25px;">Сохранить изменения</button>
+            </form>
+        </div>
+    </main>
+
+    <style>
+        .settings-section h3 {
+            margin: 0 0 15px;
+            color: #334155;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #475569;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+    </style>
+    <?php require 'toast.php'; ?>
 </body>
+
 </html>
