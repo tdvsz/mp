@@ -87,7 +87,7 @@ try {
         <?php else: ?>
             <?php foreach($doctors as $doc): ?>
                 <div class="doctor-card">
-                    <img src="<?=htmlspecialchars($doc['photo'])?>" alt="<?=htmlspecialchars($doc['full_name'])?>" onerror="this.src='https://placehold.co/150x200/e2e8f0/1e293b?text=Нет+фото'">
+                    <img src="uploads/<?=htmlspecialchars($doc['photo'])?>" alt="<?=htmlspecialchars($doc['full_name'])?>" onerror="this.src='https://placehold.co/150x200/e2e8f0/1e293b?text=Нет+фото'">
                     <div class="card-info">
                         <h3><?=htmlspecialchars($doc['full_name'])?></h3>
                         <p class="spec"><?=htmlspecialchars($doc['specialty_name'] ?? 'Не указана')?></p>

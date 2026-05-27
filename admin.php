@@ -29,26 +29,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // === ВРАЧИ ===
         elseif (isset($_POST['add_doctor']) || isset($_POST['edit_doctor'])) {
-            $data = [
-                $_POST['full_name'],
-                $_POST['email'],
-                $_POST['specialty_id'] ?: null,
-                $_POST['experience_years'],
-                $_POST['photo'] ?: null
-            ];
-            
-            if (isset($_POST['edit_doctor']) && !empty($_POST['doctor_id'])) {
-                $data[] = (int)$_POST['doctor_id'];
-                $pdo->prepare("UPDATE users SET full_name=?, email=?, specialty_id=?, experience_years=?, photo=? WHERE id=?")
-                    ->execute($data);
-                $msg = 'Врач обновлен';
-            } else {
-                $data[] = password_hash($_POST['password'] ?? '123456', PASSWORD_DEFAULT);
-                $pdo->prepare("INSERT INTO users (full_name, email, specialty_id, experience_years, photo, password_hash, role) VALUES (?,?,?,?,?,?,'doctor')")
-                    ->execute($data);
-                $msg = 'Врач добавлен';
-            }
+    // Определяем старое фото (для редактирования)
+    $photo_filename = null;
+    if (isset($_POST['edit_doctor']) && !empty($_POST['doctor_id'])) {
+        $stmt_old = $pdo->prepare("SELECT photo FROM users WHERE id = ?");
+        $stmt_old->execute([(int)$_POST['doctor_id']]);
+        $photo_filename = $stmt_old->fetchColumn();
+    }
+
+    // Обрабатываем загрузку файла
+    if (!empty($_FILES['photo']['name'])) {
+        $uploaded = handlePhotoUpload($_FILES['photo'], $photo_filename);
+        if ($uploaded === false) {
+            $err = 'Ошибка загрузки фото. Проверьте формат (JPG/PNG/WebP) и размер (макс. 2MB).';
+        } else {
+            $photo_filename = $uploaded;
         }
+    }
+
+    if (empty($err)) {
+        $data = [
+            $_POST['full_name'],
+            $_POST['email'],
+            $_POST['specialty_id'] ?: null,
+            $_POST['experience_years'],
+            $photo_filename // ← используем обработанное имя файла
+        ];
+        
+        if (isset($_POST['edit_doctor']) && !empty($_POST['doctor_id'])) {
+            $data[] = (int)$_POST['doctor_id'];
+            $pdo->prepare("UPDATE users SET full_name=?, email=?, specialty_id=?, experience_years=?, photo=? WHERE id=?")
+                ->execute($data);
+            $msg = 'Врач обновлен';
+        } else {
+            $data[] = password_hash($_POST['password'] ?? '123456', PASSWORD_DEFAULT);
+            $pdo->prepare("INSERT INTO users (full_name, email, specialty_id, experience_years, photo, password_hash, role) VALUES (?,?,?,?,?,?,'doctor')")
+                ->execute($data);
+            $msg = 'Врач добавлен';
+        }
+    }
+}
         elseif (isset($_POST['delete_doctor'])) {
             $pdo->prepare("DELETE FROM users WHERE id = ? AND role='doctor'")->execute([(int)$_POST['doctor_id']]);
             $msg = 'Врач удален';
@@ -514,7 +534,7 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
             <h3 id="doctorModalTitle">Добавить врача</h3>
             <button class="modal-close" onclick="closeModal('doctorModal')">×</button>
         </div>
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
             <input type="hidden" name="doctor_id" id="doctor_id">
             <div class="form-group"><label>ФИО:</label><input type="text" name="full_name" id="doctor_full_name" required></div>
             <div class="form-group"><label>Email:</label><input type="email" name="email" id="doctor_email" required></div>
@@ -529,7 +549,13 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
                 </select>
             </div>
             <div class="form-group"><label>Стаж (лет):</label><input type="number" name="experience_years" id="doctor_experience_years" min="0" required></div>
-            <div class="form-group"><label>Фото (URL):</label><input type="url" name="photo" id="doctor_photo"></div>
+            <div class="form-group">
+    <label>Фото врача:</label>
+    <input type="hidden" name="existing_photo" id="doctor_existing_photo">
+    <input type="file" name="photo" id="doctor_photo_file" accept="image/*">
+    <small style="color: #64748b;">JPG, PNG, WebP (макс. 2MB)</small>
+    <div id="doctor_photo_preview" style="margin-top:5px;"></div>
+</div>
             <button type="submit" name="add_doctor" class="btn-add" style="width:100%;">Сохранить</button>
         </form>
     </div>
@@ -610,7 +636,10 @@ function editDoctor(data) {
     document.getElementById('doctor_email').value = data.email || '';
     document.getElementById('doctor_specialty_id').value = data.specialty_id || '';
     document.getElementById('doctor_experience_years').value = data.experience_years || '';
-    document.getElementById('doctor_photo').value = data.photo || '';
+    document.getElementById('doctor_existing_photo').value = data.photo || '';
+document.getElementById('doctor_photo_preview').innerHTML = data.photo 
+    ? `<img src="uploads/${data.photo}" style="height:50px; margin-top:5px;">` 
+    : '';
     document.getElementById('doctorModal').classList.add('active');
 }
 function editService(data) {

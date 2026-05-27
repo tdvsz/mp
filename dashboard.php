@@ -365,7 +365,7 @@ if ($role === 'doctor') {
             <div class="patients-grid">
                 <?php foreach($patients_list as $pat): ?>
                 <div class="patient-card-mini">
-                    <img src="<?=htmlspecialchars($pat['photo'] ?? 'https://placehold.co/150x200/e2e8f0/1e293b?text=П')?>" 
+                    <img src="uploads/<?=htmlspecialchars($pat['photo'] ?? 'https://placehold.co/150x200/e2e8f0/1e293b?text=П')?>" 
                          onerror="this.src='https://placehold.co/150x200/e2e8f0/1e293b?text=П'">
                     <div class="pat-info">
                         <h4><?=htmlspecialchars($pat['full_name'])?></h4>

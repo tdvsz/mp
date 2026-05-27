@@ -210,7 +210,7 @@ function build_calendar($pdo, $doc_id, $srv_id, $month_str, $active_date) {
     <div class="booking-layout">
         <aside class="doctor-sidebar">
     <div class="doctor-profile-card">
-        <img src="<?=htmlspecialchars($doctor['photo'])?>" onerror="this.src='https://placehold.co/150x200/e2e8f0/1e293b?text=Нет+фото'">
+        <img src="uploads/<?=htmlspecialchars($doctor['photo'])?>" onerror="this.src='https://placehold.co/150x200/e2e8f0/1e293b?text=Нет+фото'">
         <h2><?=htmlspecialchars($doctor['full_name'])?></h2>
         <span class="badge-spec"><?=htmlspecialchars($doctor['specialty'] ?? '')?></span>
         <p class="exp-text">Стаж: <?=$doctor['experience_years']?> лет</p>

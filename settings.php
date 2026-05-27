@@ -17,7 +17,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_name = trim($_POST['full_name']);
     $new_email = trim($_POST['email']);
     $new_telegram = trim($_POST['telegram_nick']);
-    $new_photo = trim($_POST['photo']);
+    $photo_filename = $user['photo']; // Оставляем старое по умолчанию
+if (!empty($_FILES['photo']['name'])) {
+    $uploaded = handlePhotoUpload($_FILES['photo'], $user['photo']);
+    if ($uploaded === false) {
+        $err = 'Ошибка при загрузке фото. Проверьте формат и размер.';
+    } else {
+        $photo_filename = $uploaded;
+    }
+}
     
     $old_pass = $_POST['old_password'] ?? '';
     $new_pass = $_POST['new_password'] ?? '';
@@ -37,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             // Формируем запрос обновления
             $update_fields = "full_name = ?, email = ?, telegram_nick = ?, photo = ?";
-            $params = [$new_name, $new_email, $new_telegram, $new_photo];
+            $params = [$new_name, $new_email, $new_telegram, $photo_filename];
             
             // Если указан новый пароль
             if (!empty($new_pass)) {
@@ -89,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <main class="container" style="max-width:700px;">
     <h1 style="margin-bottom:25px;">️ Настройки профиля</h1>
     <div class="card">
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
             <div class="settings-section">
                 <h3> Основная информация</h3>
                 
@@ -111,12 +119,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endif; ?>
                 
                 <div class="form-group">
-                    <label>Ссылка на фото:</label>
-                    <input type="url" name="photo" value="<?=htmlspecialchars($user['photo'] ?? '')?>" placeholder="https://example.com/photo.jpg">
-                    <?php if(!empty($user['photo'])): ?>
-                        <img src="<?=htmlspecialchars($user['photo'])?>" style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-top:10px;" onerror="this.style.display='none'">
-                    <?php endif; ?>
-                </div>
+    <label>Фото профиля:</label>
+    <!-- Показываем текущее фото, если есть -->
+    <?php if(!empty($user['photo'])): ?>
+        <div style="margin-bottom: 10px;">
+            <img src="uploads/<?=htmlspecialchars($user['photo'])?>" 
+                 style="width:80px; height:80px; border-radius:50%; object-fit:cover;" 
+                 onerror="this.style.display='none'">
+        </div>
+    <?php endif; ?>
+    
+    <input type="file" name="photo" accept="image/*">
+    <small style="color: #64748b;">JPG, PNG, WebP (макс. 2MB)</small>
+</div>
             </div>
             
             <div class="settings-section" style="margin-top:30px; padding-top:30px; border-top:1px solid var(--border);">
