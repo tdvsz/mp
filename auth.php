@@ -4,34 +4,43 @@ $err = $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'];
-    $email = trim($_POST['email']);
+    $phone = trim($_POST['phone']);
     $pass = $_POST['password'];
 
     if ($action === 'register') {
         $name = trim($_POST['full_name']);
-        if (!$email || !$pass || !$name) $err = 'Заполните все поля';
-        elseif (filter_var($email, FILTER_VALIDATE_EMAIL) === false) $err = 'Неверный формат email';
+        $email = trim($_POST['email']); // опционально
+        if (!$phone || !$pass || !$name) $err = 'Заполните все обязательные поля';
+        elseif (!preg_match('/^\+?[0-9]{9,15}$/', $phone)) $err = 'Неверный формат номера телефона';
         else {
-            $hash = password_hash($pass, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("INSERT INTO users (email, password_hash, role, full_name) VALUES (?, ?, 'patient', ?)");
-            try {
-                $stmt->execute([$email, $hash, $name]);
-                $success = 'Регистрация успешна. Войдите.';
-            } catch (PDOException $e) {
-                $err = 'Этот email уже зарегистрирован';
+            // Проверка уникальности номера
+            $stmt = $pdo->prepare("SELECT id FROM users WHERE phone_number = ?");
+            $stmt->execute([$phone]);
+            if ($stmt->fetch()) {
+                $err = 'Этот номер телефона уже зарегистрирован';
+            } else {
+                $hash = password_hash($pass, PASSWORD_DEFAULT);
+                // email опционален
+                $email = $email ?: null;
+                $stmt = $pdo->prepare("INSERT INTO users (phone_number, email, password_hash, role, full_name) VALUES (?, ?, ?, 'patient', ?)");
+                try {
+                    $stmt->execute([$phone, $email, $hash, $name]);
+                    $success = 'Регистрация успешна. Теперь войдите.';
+                } catch (PDOException $e) {
+                    $err = 'Ошибка регистрации: ' . ($e->errorInfo[1] == 1062 ? 'Такой номер или email уже используется' : $e->getMessage());
+                }
             }
         }
     } elseif ($action === 'login') {
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-        $stmt->execute([$email]);
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE phone_number = ?");
+        $stmt->execute([$phone]);
         $user = $stmt->fetch();
         if ($user && password_verify($pass, $user['password_hash'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['role'] = $user['role'];
             $_SESSION['full_name'] = $user['full_name'];
-            // Пациенты идут к врачам, остальные в кабинет
             redirect($user['role'] === 'patient' ? 'doctors.php' : 'dashboard.php');
-        } else $err = 'Неверный email или пароль';
+        } else $err = 'Неверный номер телефона или пароль';
     }
 }
 ?>
@@ -51,7 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form method="POST">
             <input type="hidden" name="action" id="action" value="login">
             <input type="text" name="full_name" id="name-field" placeholder="ФИО" style="display:none;">
-            <input type="email" name="email" placeholder="Номер телефона" required>
+            <input type="text" name="email" id="email-field" placeholder="Email (для уведомлений)" style="display:none;">
+            <input type="tel" name="phone" placeholder="Номер телефона" required>
             <input type="password" name="password" placeholder="Пароль" required>
             <button type="submit">Войти</button>
         </form>
@@ -60,19 +70,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script>
         function toggleAuth() {
             const f = document.getElementById('action'),
-                n = document.getElementById('name-field');
+                nameField = document.getElementById('name-field'),
+                emailField = document.getElementById('email-field'),
+                btn = document.querySelector('button');
             if (f.value === 'login') {
                 f.value = 'register';
-                n.style.display = 'block';
-                document.querySelector('button').textContent = 'Зарегистрироваться';
+                nameField.style.display = 'block';
+                emailField.style.display = 'block';
+                btn.textContent = 'Зарегистрироваться';
             } else {
                 f.value = 'login';
-                n.style.display = 'none';
-                document.querySelector('button').textContent = 'Войти';
+                nameField.style.display = 'none';
+                emailField.style.display = 'none';
+                btn.textContent = 'Войти';
             }
         }
     </script>
+    <?php require 'toast.php'; ?>
 </body>
-<?php require 'toast.php'; ?>
 
 </html>

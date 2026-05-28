@@ -58,7 +58,7 @@ $patient_history_params = [];
 if ($role === 'patient') {
     // Предстоящие приемы
     $up = $pdo->prepare("SELECT a.id, a.appointment_date, a.start_time, a.status, a.price,
-            d.full_name as doctor_name, d.telegram_nick, s.name as service_name, s.duration_minutes
+            d.full_name as doctor_name, d.email as doctor_email, s.name as service_name, s.duration_minutes
             FROM appointments a JOIN users d ON a.doctor_id = d.id JOIN services s ON a.service_id = s.id
             WHERE a.patient_id = ? AND a.appointment_date >= CURDATE() AND a.status = 'booked'
             ORDER BY a.appointment_date ASC, a.start_time ASC");
@@ -112,7 +112,7 @@ $doctor_future = [];
 if ($role === 'doctor') {
     // Приемы на сегодня
     $td = $pdo->prepare("SELECT a.id, a.start_time, a.status, a.price,
-            p.id as patient_id, p.full_name as patient_name, p.telegram_nick,
+            p.id as patient_id, p.full_name as patient_name, p.email,
             s.name as service_name, s.duration_minutes
             FROM appointments a JOIN users p ON a.patient_id = p.id JOIN services s ON a.service_id = s.id
             WHERE a.doctor_id = ? AND a.appointment_date = CURDATE() AND a.status = 'booked'
@@ -122,7 +122,7 @@ if ($role === 'doctor') {
 
     // Приемы на будущие дни
     $ft = $pdo->prepare("SELECT a.id, a.appointment_date, a.start_time, a.status, a.price,
-            p.id as patient_id, p.full_name as patient_name,
+            p.id as patient_id, p.full_name as patient_name, p.email,
             s.name as service_name
             FROM appointments a JOIN users p ON a.patient_id = p.id JOIN services s ON a.service_id = s.id
             WHERE a.doctor_id = ? AND a.appointment_date > CURDATE() AND a.status = 'booked'
@@ -187,8 +187,8 @@ if ($role === 'doctor') {
                                 <h3><?= htmlspecialchars($ap['service_name']) ?></h3>
                                 <p class="ap-doctor"><?= htmlspecialchars($ap['doctor_name']) ?></p>
                                 <p class="ap-time"><?= substr($ap['start_time'], 0, 5) ?> • <?= $ap['duration_minutes'] ?> мин</p>
-                                <?php if (!empty($ap['telegram_nick'])): ?>
-                                    <p class="ap-tg"> Telegram: <a href="https://t.me/<?= htmlspecialchars($ap['telegram_nick']) ?>" target="_blank">@<?= htmlspecialchars($ap['telegram_nick']) ?></a></p>
+                                <?php if (!empty($ap['doctor_email'])): ?>
+                                    <p class="ap-email">📧 Email: <a href="mailto:<?= htmlspecialchars($ap['doctor_email']) ?>"><?= htmlspecialchars($ap['doctor_email']) ?></a></p>
                                 <?php endif; ?>
                             </div>
                             <div class="ap-price"><?= number_format($ap['price'], 0, ',', ' ') ?> BUN</div>
@@ -292,8 +292,8 @@ if ($role === 'doctor') {
                             <div class="ap-info">
                                 <h3><?= htmlspecialchars($ap['service_name']) ?></h3>
                                 <p><?= htmlspecialchars($ap['patient_name']) ?></p>
-                                <?php if (!empty($ap['telegram_nick'])): ?>
-                                    <p><a href="https://t.me/<?= htmlspecialchars($ap['telegram_nick']) ?>" target="_blank">@<?= htmlspecialchars($ap['telegram_nick']) ?></a></p>
+                                <?php if (!empty($ap['email'])): ?>
+                                    <p><a href="mailto:<?= htmlspecialchars($ap['email']) ?>"><?= htmlspecialchars($ap['email']) ?></a></p>
                                 <?php endif; ?>
                             </div>
                             <div class="ap-actions">
@@ -342,7 +342,7 @@ if ($role === 'doctor') {
                 $pat_limit = 10;
                 $pat_offset = ($pat_page - 1) * $pat_limit;
 
-                $pat_where = "SELECT DISTINCT p.id, p.full_name, p.telegram_nick, p.photo,
+                $pat_where = "SELECT DISTINCT p.id, p.full_name, p.email, p.photo,
                 COUNT(a.id) as visits_count, MAX(a.appointment_date) as last_visit
                 FROM appointments a
                 JOIN users p ON a.patient_id = p.id
@@ -395,8 +395,8 @@ if ($role === 'doctor') {
                                     onerror="this.src='https://placehold.co/150x200/e2e8f0/1e293b?text=П'">
                                 <div class="pat-info">
                                     <h4><?= htmlspecialchars($pat['full_name']) ?></h4>
-                                    <?php if (!empty($pat['telegram_nick'])): ?>
-                                        <p class="tg-mini"><a href="https://t.me/<?= htmlspecialchars($pat['telegram_nick']) ?>" target="_blank">@<?= htmlspecialchars($pat['telegram_nick']) ?></a></p>
+                                    <?php if (!empty($pat['email'])): ?>
+                                        <p class="email-mini"><a href="mailto:<?= htmlspecialchars($pat['email']) ?>"><?= htmlspecialchars($pat['email']) ?></a></p>
                                     <?php endif; ?>
                                     <p class="pat-stats">Визитов: <?= $pat['visits_count'] ?> • Последний: <?= format_date_ru($pat['last_visit']) ?></p>
                                 </div>
@@ -459,32 +459,32 @@ if ($role === 'doctor') {
             <!-- Статистика -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-icon">👥</div>
+                    <div class="stat-icon"></div>
                     <div class="stat-value"><?= $stats['total_patients'] ?></div>
                     <div class="stat-label">Всего пациентов</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">👨‍⚕️</div>
+                    <div class="stat-icon"></div>
                     <div class="stat-value"><?= $stats['total_doctors'] ?></div>
                     <div class="stat-label">Врачей</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">📅</div>
+                    <div class="stat-icon"></div>
                     <div class="stat-value"><?= $stats['appointments_today'] ?></div>
                     <div class="stat-label">Записей сегодня</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">📈</div>
+                    <div class="stat-icon"></div>
                     <div class="stat-value"><?= $stats['appointments_week'] ?></div>
                     <div class="stat-label">Записей за неделю</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">💰</div>
+                    <div class="stat-icon"></div>
                     <div class="stat-value"><?= number_format($stats['revenue_month'], 0, ',', ' ') ?> BUN</div>
                     <div class="stat-label">Доход за месяц</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">❌</div>
+                    <div class="stat-icon"></div>
                     <div class="stat-value"><?= $stats['cancellation_rate'] ?? 0 ?>%</div>
                     <div class="stat-label">Отмен за месяц</div>
                 </div>

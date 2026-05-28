@@ -35,35 +35,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt_old->execute([(int)$_POST['doctor_id']]);
                 $photo_filename = $stmt_old->fetchColumn();
             }
-
-            // Обрабатываем загрузку файла
             if (!empty($_FILES['photo']['name'])) {
                 $uploaded = handlePhotoUpload($_FILES['photo'], $photo_filename);
-                if ($uploaded === false) {
-                    $err = 'Ошибка загрузки фото. Проверьте формат (JPG/PNG/WebP) и размер (макс. 2MB).';
-                } else {
-                    $photo_filename = $uploaded;
-                }
+                if ($uploaded === false) $err = 'Ошибка загрузки фото.';
+                else $photo_filename = $uploaded;
             }
-
             if (empty($err)) {
-                $data = [
-                    $_POST['full_name'],
-                    $_POST['email'],
-                    $_POST['specialty_id'] ?: null,
-                    $_POST['experience_years'],
-                    $photo_filename // ← используем обработанное имя файла
-                ];
+                $phone = trim($_POST['phone_number']);
+                $email = trim($_POST['email']) ?: null;
+                $full_name = $_POST['full_name'];
+                $specialty_id = $_POST['specialty_id'] ?: null;
+                $exp = (int)$_POST['experience_years'];
 
                 if (isset($_POST['edit_doctor']) && !empty($_POST['doctor_id'])) {
-                    $data[] = (int)$_POST['doctor_id'];
-                    $pdo->prepare("UPDATE users SET full_name=?, email=?, specialty_id=?, experience_years=?, photo=? WHERE id=?")
-                        ->execute($data);
+                    $id = (int)$_POST['doctor_id'];
+                    $pdo->prepare("UPDATE users SET full_name=?, phone_number=?, email=?, specialty_id=?, experience_years=?, photo=? WHERE id=?")
+                        ->execute([$full_name, $phone, $email, $specialty_id, $exp, $photo_filename, $id]);
                     $msg = 'Врач обновлен';
                 } else {
-                    $data[] = password_hash($_POST['password'] ?? '123456', PASSWORD_DEFAULT);
-                    $pdo->prepare("INSERT INTO users (full_name, email, specialty_id, experience_years, photo, password_hash, role) VALUES (?,?,?,?,?,?,'doctor')")
-                        ->execute($data);
+                    $pass_hash = password_hash($_POST['password'] ?? '123456', PASSWORD_DEFAULT);
+                    $pdo->prepare("INSERT INTO users (full_name, phone_number, email, specialty_id, experience_years, photo, password_hash, role) VALUES (?,?,?,?,?,?,?,'doctor')")
+                        ->execute([$full_name, $phone, $email, $specialty_id, $exp, $photo_filename, $pass_hash]);
                     $msg = 'Врач добавлен';
                 }
             }
@@ -138,8 +130,8 @@ switch ($active_tab) {
         break;
 
     case 'doctors':
-        $stmt = $pdo->prepare("
-            SELECT u.*, s.name as specialty_name
+                $stmt = $pdo->prepare("
+            SELECT u.id, u.full_name, u.phone_number, u.email, u.experience_years, u.photo, s.name as specialty_name
             FROM users u
             LEFT JOIN specialties s ON u.specialty_id = s.id
             WHERE u.role = 'doctor'
@@ -175,8 +167,8 @@ switch ($active_tab) {
         break;
 
     case 'patients':
-        $stmt = $pdo->prepare("
-            SELECT u.*, COUNT(a.id) as appointments_count
+                $stmt = $pdo->prepare("
+            SELECT u.id, u.full_name, u.email, COUNT(a.id) as appointments_count
             FROM users u
             LEFT JOIN appointments a ON u.id = a.patient_id
             WHERE u.role = 'patient'
@@ -530,6 +522,7 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
                     <tr>
                         <th>ID</th>
                         <th>ФИО</th>
+                        <th>Телефон</th>
                         <th>Email</th>
                         <th>Специальность</th>
                         <th>Стаж</th>
@@ -541,6 +534,7 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
                         <tr>
                             <td><?= $row['id'] ?></td>
                             <td><?= htmlspecialchars($row['full_name']) ?></td>
+                            <td><?= htmlspecialchars($row['phone_number']) ?></td>
                             <td><?= htmlspecialchars($row['email']) ?></td>
                             <td><?= htmlspecialchars($row['specialty_name'] ?? '-') ?></td>
                             <td><?= $row['experience_years'] ?> лет</td>
@@ -624,7 +618,6 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
                         <th>ФИО</th>
                         <th>Email</th>
                         <th>Записей</th>
-                        <th>Telegram</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -634,7 +627,6 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
                             <td><?= htmlspecialchars($row['full_name']) ?></td>
                             <td><?= htmlspecialchars($row['email']) ?></td>
                             <td><?= $row['appointments_count'] ?></td>
-                            <td><?= htmlspecialchars($row['telegram_nick'] ?? '-') ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -668,6 +660,7 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
             <form method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="doctor_id" id="doctor_id">
                 <div class="form-group"><label>ФИО:</label><input type="text" name="full_name" id="doctor_full_name" required></div>
+                <div class="form-group"><label>Телефон:</label><input type="tel" name="phone_number" id="doctor_phone" required></div>
                 <div class="form-group"><label>Email:</label><input type="email" name="email" id="doctor_email" required></div>
                 <div class="form-group"><label>Пароль (оставьте пустым при редактировании):</label><input type="password" name="password" id="doctor_password"></div>
                 <div class="form-group">
@@ -767,6 +760,7 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
             document.getElementById('doctorModalTitle').textContent = 'Редактировать врача';
             document.getElementById('doctor_id').value = data.id || '';
             document.getElementById('doctor_full_name').value = data.full_name || '';
+            document.getElementById('doctor_phone').value = data.phone_number || '';
             document.getElementById('doctor_email').value = data.email || '';
             document.getElementById('doctor_specialty_id').value = data.specialty_id || '';
             document.getElementById('doctor_experience_years').value = data.experience_years || '';

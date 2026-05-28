@@ -15,8 +15,8 @@ $err = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_name = trim($_POST['full_name']);
+    $new_phone = trim($_POST['phone_number']);
     $new_email = trim($_POST['email']);
-    $new_telegram = trim($_POST['telegram_nick']);
     $photo_filename = $user['photo']; // Оставляем старое по умолчанию
     if (!empty($_FILES['photo']['name'])) {
         $uploaded = handlePhotoUpload($_FILES['photo'], $user['photo']);
@@ -32,32 +32,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $confirm_pass = $_POST['confirm_password'] ?? '';
 
     // Валидация
-    if (empty($new_name)) {
-        $err = 'ФИО не может быть пустым';
-    } elseif (!filter_var($new_email, FILTER_VALIDATE_EMAIL)) {
-        $err = 'Неверный формат email';
-    } else {
-        // Проверяем уникальность email (кроме текущего пользователя)
-        $check_email = $pdo->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
-        $check_email->execute([$new_email, $user_id]);
-        if ($check_email->fetch()) {
-            $err = 'Этот email уже используется другим пользователем';
+    if (empty($new_name)) $err = 'ФИО не может быть пустым';
+    elseif (empty($new_phone)) $err = 'Номер телефона не может быть пустым';
+    elseif (!preg_match('/^\+?[0-9]{9,15}$/', $new_phone)) $err = 'Неверный формат номера телефона';
+    else {
+        // Проверяем уникальность номера и email (если email задан)
+        $check = $pdo->prepare("SELECT id FROM users WHERE (phone_number = ? OR (email = ? AND email IS NOT NULL)) AND id != ?");
+        $check->execute([$new_phone, $new_email, $user_id]);
+        if ($check->fetch()) {
+            $err = 'Этот номер телефона или email уже используется другим пользователем';
         } else {
-            // Формируем запрос обновления
-            $update_fields = "full_name = ?, email = ?, telegram_nick = ?, photo = ?";
-            $params = [$new_name, $new_email, $new_telegram, $photo_filename];
+            $update_fields = "full_name = ?, phone_number = ?, email = ?, photo = ?";
+            $params = [$new_name, $new_phone, $new_email, $photo_filename];
 
-            // Если указан новый пароль
             if (!empty($new_pass)) {
-                if (empty($old_pass)) {
-                    $err = 'Для смены пароля введите текущий пароль';
-                } elseif (!password_verify($old_pass, $user['password_hash'])) {
-                    $err = 'Текущий пароль неверный';
-                } elseif ($new_pass !== $confirm_pass) {
-                    $err = 'Новый пароль и подтверждение не совпадают';
-                } elseif (strlen($new_pass) < 6) {
-                    $err = 'Новый пароль должен быть не менее 6 символов';
-                } else {
+                if (empty($old_pass)) $err = 'Для смены пароля введите текущий пароль';
+                elseif (!password_verify($old_pass, $user['password_hash'])) $err = 'Текущий пароль неверный';
+                elseif ($new_pass !== $confirm_pass) $err = 'Новый пароль и подтверждение не совпадают';
+                elseif (strlen($new_pass) < 6) $err = 'Новый пароль должен быть не менее 6 символов';
+                else {
                     $update_fields .= ", password_hash = ?";
                     $params[] = password_hash($new_pass, PASSWORD_DEFAULT);
                 }
@@ -66,12 +59,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (empty($err)) {
                 $params[] = $user_id;
                 $pdo->prepare("UPDATE users SET $update_fields WHERE id = ?")->execute($params);
-
-                // Обновляем сессию
                 $_SESSION['full_name'] = $new_name;
-                $msg = '✅ Профиль успешно обновлен!';
-
-                // Перезагружаем данные
+                $msg = 'Профиль успешно обновлен!';
                 $stmt->execute([$user_id]);
                 $user = $stmt->fetch();
             }
@@ -108,17 +97,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="text" name="full_name" value="<?= htmlspecialchars($user['full_name']) ?>" required>
                     </div>
 
+                    <div class="form-group"><label>Номер телефона:</label><input type="tel" name="phone_number" value="<?= htmlspecialchars($user['phone_number']) ?>" required></div>
+
                     <div class="form-group">
                         <label>Email:</label>
                         <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required>
                     </div>
-
-                    <?php if ($role !== 'admin'): ?>
-                        <div class="form-group">
-                            <label>Telegram ник (без @):</label>
-                            <input type="text" name="telegram_nick" value="<?= htmlspecialchars($user['telegram_nick'] ?? '') ?>" placeholder="username">
-                        </div>
-                    <?php endif; ?>
 
                     <div class="form-group">
                         <label>Фото профиля:</label>

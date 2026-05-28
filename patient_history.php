@@ -8,7 +8,7 @@ $patient_id = (int)($_GET['patient_id'] ?? 0);
 if (!$patient_id) redirect('dashboard.php');
 
 // 1. Проверка: существует ли пациент и был ли он у этого врача?
-$check = $pdo->prepare("SELECT id, full_name, telegram_nick, photo FROM users WHERE id = ? AND role = 'patient'");
+$check = $pdo->prepare("SELECT id, full_name, email, photo FROM users WHERE id = ? AND role = 'patient'");
 $check->execute([$patient_id]);
 $patient = $check->fetch();
 
@@ -88,10 +88,8 @@ $history = $stmt->fetchAll();
             </div>
             <div class="pp-info">
                 <h1><?= htmlspecialchars($patient['full_name']) ?></h1>
-                <?php if (!empty($patient['telegram_nick'])): ?>
-                    <p class="tg-link">
-                        📱 Telegram: <a href="https://t.me/<?= htmlspecialchars($patient['telegram_nick']) ?>" target="_blank">@<?= htmlspecialchars($patient['telegram_nick']) ?></a>
-                    </p>
+                <?php if (!empty($patient['email'])): ?>
+                    <p class="email-link">📧 Email: <a href="mailto:<?= htmlspecialchars($patient['email']) ?>"><?= htmlspecialchars($patient['email']) ?></a></p>
                 <?php else: ?>
                     <p class="tg-link" style="opacity:0.5">Telegram не указан</p>
                 <?php endif; ?>
