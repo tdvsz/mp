@@ -1,0 +1,468 @@
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.section-title {
+    margin: 30px 0 15px;
+    color: var(--primary);
+}
+
+.section-title.today {
+    margin: 0 0 15px;
+    color: #10b981;
+}
+
+.section-title.future {
+    margin: 30px 0 15px;
+    color: #3b82f6;
+}
+
+.section-title.patients {
+    margin: 0 0 20px;
+    color: #6366f1;
+}
+
+.patients-section {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 2px solid var(--border);
+}
+
+.search-form {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.empty-msg {
+    color: #64748b;
+    text-align: center;
+    padding: 20px;
+}
+
+.badge-primary {
+    background: var(--primary);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.history-title {
+    margin: 0;
+    color: #64748b;
+}
+
+.h-42 {
+    height: 42px;
+}
+
+.appointments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.appointment-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 18px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    transition: 0.2s;
+}
+
+.appointment-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+}
+
+.appointment-card.upcoming {
+    border-left: 4px solid var(--primary);
+}
+
+.ap-date {
+    text-align: center;
+    min-width: 60px;
+    background: #f8fafc;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.ap-day {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1;
+}
+
+.ap-month {
+    font-size: 0.75rem;
+    color: #64748b;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.ap-info {
+    flex-grow: 1;
+}
+
+.ap-info h3 {
+    margin: 0 0 4px;
+    font-size: 1.05rem;
+    color: #0f172a;
+}
+
+.ap-doctor,
+.ap-time,
+.ap-email {
+    margin: 2px 0;
+    font-size: 0.9rem;
+    color: #475569;
+}
+
+.ap-email a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.ap-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary);
+    min-width: 90px;
+    text-align: right;
+}
+
+.ap-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-cancel {
+    padding: 8px 14px;
+    background: #fee2e2;
+    color: #b91c1c;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.btn-cancel:hover {
+    background: #ef4444;
+    color: #fff;
+}
+
+.btn-confirm {
+    padding: 8px 14px;
+    background: #d1fae5;
+    color: #047857;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.btn-history {
+    padding: 8px 14px;
+    background: #f1f5f9;
+    color: #475569;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.history-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 30px 0 15px;
+    padding: 15px;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+}
+
+.history-filters-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.filter-group label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.filter-group input,
+.filter-group select {
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.patients-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
+}
+
+.patient-card-mini {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    align-items: center;
+    transition: 0.2s;
+}
+
+.patient-card-mini:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.patient-card-mini img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.pat-info h4 {
+    margin: 0 0 4px;
+    font-size: 1rem;
+    color: #0f172a;
+}
+
+.email-mini {
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+.email-mini a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.pat-stats {
+    margin: 4px 0 0;
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.stat-label {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.quick-actions {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.quick-action-btn {
+    flex: 1;
+    min-width: 200px;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.quick-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+}
+
+.quick-action-btn.secondary {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.quick-action-btn.tertiary {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.quick-action-btn.quaternary {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.quick-action-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.quick-action-text {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.dashboard-card {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 25px;
+}
+
+.dashboard-card h3 {
+    margin: 0 0 20px;
+    color: var(--text);
+    font-size: 1.2rem;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 15px;
+}
+
+.list-item {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.list-item:last-child {
+    border-bottom: none;
+}
+
+.list-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.list-item-title {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.list-item-meta {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+@media(max-width:700px) {
+    .history-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .history-filters-row {
+        flex-direction: column;
+    }
+
+    .patients-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .appointment-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .ap-actions {
+        width: 100%;
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-confirm,
+    .btn-history,
+    .btn-cancel {
+        flex: 1;
+        text-align: center;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .quick-actions {
+        flex-direction: column;
+    }
+}

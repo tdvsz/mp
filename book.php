@@ -209,6 +209,7 @@ function build_calendar($pdo, $doc_id, $srv_id, $month_str, $active_date)
     <meta charset="UTF-8">
     <title>Запись | Medprofi</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="book.css">
 </head>
 
 <body>

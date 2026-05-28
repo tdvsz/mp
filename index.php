@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>Medprofi — Современная клиника</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="index.css">
 </head>
 
 <body class="landing-page">

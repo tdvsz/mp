@@ -55,6 +55,7 @@ try {
     <meta charset="UTF-8">
     <title>Врачи | Medprofi</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="doctors.css">
 </head>
 
 <body>

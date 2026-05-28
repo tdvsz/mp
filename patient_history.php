@@ -69,6 +69,7 @@ $history = $stmt->fetchAll();
     <meta charset="UTF-8">
     <title>История пациента | Medprofi</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="patient_history.css">
 </head>
 
 <body>
@@ -192,82 +193,6 @@ $history = $stmt->fetchAll();
         <?php endif; ?>
 
     </main>
-
-    <style>
-        .patient-profile-header {
-            display: flex;
-            align-items: center;
-            gap: 25px;
-            background: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            margin-bottom: 25px;
-        }
-
-        .pp-avatar img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #f1f5f9;
-        }
-
-        .pp-info h1 {
-            margin: 0 0 8px;
-            font-size: 1.8rem;
-            color: #0f172a;
-        }
-
-        .tg-link {
-            margin: 0;
-            font-size: 1rem;
-        }
-
-        .tg-link a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .tg-link a:hover {
-            text-decoration: underline;
-        }
-
-        .filters-card {
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            margin-bottom: 25px;
-        }
-
-        .history-filters {
-            display: flex;
-            gap: 15px;
-            align-items: flex-end;
-            flex-wrap: wrap;
-        }
-
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .filter-group label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #475569;
-        }
-
-        .filter-group input,
-        .filter-group select {
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-        }
-    </style>
     <?php require 'toast.php'; ?>
 </body>
 
