@@ -88,15 +88,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $msg = 'Услуга удалена';
         }
 
-        // === СПЕЦИАЛЬНОСТИ ===
         elseif (isset($_POST['add_specialty']) || isset($_POST['edit_specialty'])) {
             if (isset($_POST['edit_specialty']) && !empty($_POST['specialty_id'])) {
-                $pdo->prepare("UPDATE specialties SET name=?, description=? WHERE id=?")
-                    ->execute([$_POST['name'], $_POST['description'], (int)$_POST['specialty_id']]);
+                $pdo->prepare("UPDATE specialties SET name=? WHERE id=?")
+                    ->execute([$_POST['name'], (int)$_POST['specialty_id']]);
                 $msg = 'Специальность обновлена';
             } else {
-                $pdo->prepare("INSERT INTO specialties (name, description) VALUES (?,?)")
-                    ->execute([$_POST['name'], $_POST['description']]);
+                $pdo->prepare("INSERT INTO specialties (name) VALUES (?)")
+                    ->execute([$_POST['name']]);
                 $msg = 'Специальность добавлена';
             }
         } elseif (isset($_POST['delete_specialty'])) {
@@ -354,7 +353,6 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
                     <tr>
                         <th>ID</th>
                         <th>Название</th>
-                        <th>Описание</th>
                         <th>Действия</th>
                     </tr>
                 </thead>
@@ -363,7 +361,6 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
                         <tr>
                             <td><?= $row['id'] ?></td>
                             <td><?= htmlspecialchars($row['name']) ?></td>
-                            <td><?= htmlspecialchars($row['description'] ?? '-') ?></td>
                             <td>
                                 <button class="btn-sm btn-edit" onclick='editSpecialty(<?= json_encode($row) ?>)'>✏️</button>
                                 <form method="POST" style="display:inline;" onsubmit="return confirm('Удалить специальность?')">
@@ -487,7 +484,6 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
             <form method="POST">
                 <input type="hidden" name="specialty_id" id="specialty_id">
                 <div class="form-group"><label>Название:</label><input type="text" name="name" id="specialty_name" required></div>
-                <div class="form-group"><label>Описание:</label><textarea name="description" id="specialty_description" rows="3"></textarea></div>
                 <button type="submit" name="add_specialty" class="btn-add" style="width:100%;">Сохранить</button>
             </form>
         </div>
@@ -551,7 +547,6 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
             document.getElementById('specialtyModalTitle').textContent = 'Редактировать специальность';
             document.getElementById('specialty_id').value = data.id || '';
             document.getElementById('specialty_name').value = data.name || '';
-            document.getElementById('specialty_description').value = data.description || '';
             document.getElementById('specialtyModal').classList.add('active');
         }
         window.onclick = function(event) {

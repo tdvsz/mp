@@ -138,6 +138,24 @@
     margin-top: 5px;
 }
 
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th:last-child, 
+.data-table td:last-child {
+    text-align: right;
+    padding-right: 20px;
+    width: 1%;
+    white-space: nowrap;
+}
+
+.data-table th:nth-child(2), 
+.data-table td:nth-child(2) {
+    width: auto;
+}
+
 @media(max-width: 768px) {
     .admin-tabs {
         gap: 5px;
