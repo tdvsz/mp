@@ -6,7 +6,12 @@ $doctor_id = (int)($_GET['doctor_id'] ?? 0);
 if (!$doctor_id) redirect('doctors.php');
 
 // 1. Врач
-$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ? AND role = 'doctor'");
+$stmt = $pdo->prepare("
+    SELECT u.*, sp.name as specialty_name 
+    FROM users u 
+    LEFT JOIN specialties sp ON u.specialty_id = sp.id 
+    WHERE u.id = ? AND u.role = 'doctor'
+");
 $stmt->execute([$doctor_id]);
 $doctor = $stmt->fetch();
 if (!$doctor) redirect('doctors.php');
@@ -232,8 +237,8 @@ function build_calendar($pdo, $doc_id, $srv_id, $month_str, $active_date)
                 <div class="doctor-profile-card">
                     <img src="uploads/<?= htmlspecialchars($doctor['photo']) ?>" onerror="this.src='https://placehold.co/150x200/e2e8f0/1e293b?text=Нет+фото'">
                     <h2><?= htmlspecialchars($doctor['full_name']) ?></h2>
-                    <span class="badge-spec"><?= htmlspecialchars($doctor['specialty'] ?? '') ?></span>
-                    <p class="exp-text">Стаж: <?= $doctor['experience_years'] ?> лет</p>
+                    <span class="badge-spec"><?= htmlspecialchars($doctor['specialty_name'] ?? 'Специалист') ?></span>
+                    <p class="exp-text">Стаж: <?= plural_years($doctor['experience_years']) ?></p>
 
                     <?php if (!empty($doctor['description'])): ?>
                         <div class="doc-divider"></div>

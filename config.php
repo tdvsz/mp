@@ -60,3 +60,13 @@ function handlePhotoUpload($file, $old_photo_path = null)
 
     return false;
 }
+
+function plural_years($years) {
+    $n = abs((int)$years);
+    $n100 = $n % 100;
+    $n10 = $n % 10;
+    if ($n100 >= 11 && $n100 <= 19) return "$n лет";
+    if ($n10 === 1) return "$n год";
+    if ($n10 >= 2 && $n10 <= 4) return "$n года";
+    return "$n лет";
+}

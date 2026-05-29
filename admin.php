@@ -303,7 +303,7 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
                             <td><?= htmlspecialchars($row['phone_number']) ?></td>
                             <td><?= htmlspecialchars($row['email']) ?></td>
                             <td><?= htmlspecialchars($row['specialty_name'] ?? '-') ?></td>
-                            <td><?= $row['experience_years'] ?> лет</td>
+                            <td><?= plural_years($row['experience_years']) ?></td>
                             <td>
                                 <button class="btn-sm btn-edit" onclick='editDoctor(<?= json_encode($row) ?>)'>✏️</button>
                                 <form method="POST" style="display:inline;" onsubmit="return confirm('Удалить врача?')">

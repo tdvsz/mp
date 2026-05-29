@@ -86,7 +86,7 @@ $history = $stmt->fetchAll();
         </div>
     </header>
 
-    <main class="container" style="max-width: 1000px;">
+    <main class="container" style="padding-top: 20px;">
         <!-- Профиль пациента -->
         <div class="patient-profile-header">
             <div class="pp-avatar">

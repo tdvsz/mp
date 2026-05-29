@@ -96,7 +96,7 @@ try {
                         <div class="card-info">
                             <h3><?= htmlspecialchars($doc['full_name']) ?></h3>
                             <p class="spec"><?= htmlspecialchars($doc['specialty_name'] ?? 'Не указана') ?></p>
-                            <p class="exp">Стаж: <?= $doc['experience_years'] ?> лет</p>
+                            <p class="exp">Стаж: <?= plural_years($doc['experience_years']) ?></p>
                             <a href="book.php?doctor_id=<?= $doc['id'] ?>" class="btn btn-primary btn-sm">Записаться</a>
                         </div>
                     </div>

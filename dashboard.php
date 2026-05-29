@@ -154,19 +154,18 @@ if ($role === 'doctor') {
         </div>
     </header>
 
-    <main class="container">
-        <?php if ($success_msg): ?><div class="success"><?= htmlspecialchars($success_msg) ?></div><?php endif; ?>
-        <?php if ($err_msg): ?><div class="err"><?= htmlspecialchars($err_msg) ?></div><?php endif; ?>
-
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; flex-wrap:wrap; gap:15px;">
-            <h1 style="margin:0;">Добро пожаловать, <?= $name ?></h1>
-            <?php if ($role === 'patient'): ?>
-                <a href="doctors.php" class="btn btn-primary">Записаться к врачу</a>
-            <?php elseif ($role === 'doctor'): ?>
-                <a href="doctor.php" class="btn btn-primary">Настроить расписание</a>
-            <?php elseif ($role === 'admin'): ?>
-                <a href="admin.php" class="btn btn-primary">Панель администратора</a>
-            <?php endif; ?>
+    <main class="container" style="padding-top: 35px;">
+        <div class="dashboard-header" style="margin-bottom: 35px; align-items: center;">
+            <h1 style="margin: 0; line-height: 1;">Добро пожаловать, <?= $name ?></h1>
+            <div style="display: flex; align-items: center;">
+                <?php if ($role === 'patient'): ?>
+                    <a href="doctors.php" class="btn btn-primary" style="margin: 0;">Записаться к врачу</a>
+                <?php elseif ($role === 'doctor'): ?>
+                    <a href="doctor.php" class="btn btn-primary" style="margin: 0;">Настроить расписание</a>
+                <?php elseif ($role === 'admin'): ?>
+                    <a href="admin.php" class="btn btn-primary" style="margin: 0;">Панель администратора</a>
+                <?php endif; ?>
+            </div>
         </div>
 
         <!-- ================= ПАЦИЕНТ ================= -->
