@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <div class="form-group">
                         <label>Email:</label>
-                        <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required>
+                        <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>">
                     </div>
 
                     <div class="form-group">

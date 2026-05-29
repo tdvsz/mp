@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         elseif (isset($_POST['add_doctor']) || isset($_POST['edit_doctor'])) {
             // Определяем старое фото (для редактирования)
             $photo_filename = null;
-            if (isset($_POST['edit_doctor']) && !empty($_POST['doctor_id'])) {
+            if (!empty($_POST['doctor_id'])) {
                 $stmt_old = $pdo->prepare("SELECT photo FROM users WHERE id = ?");
                 $stmt_old->execute([(int)$_POST['doctor_id']]);
                 $photo_filename = $stmt_old->fetchColumn();
@@ -47,12 +47,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $specialty_id = $_POST['specialty_id'] ?: null;
                 $exp = (int)$_POST['experience_years'];
 
-                if (isset($_POST['edit_doctor']) && !empty($_POST['doctor_id'])) {
+                if (!empty($_POST['doctor_id'])) {
                     $id = (int)$_POST['doctor_id'];
                     $pdo->prepare("UPDATE users SET full_name=?, phone_number=?, email=?, specialty_id=?, experience_years=?, photo=? WHERE id=?")
                         ->execute([$full_name, $phone, $email, $specialty_id, $exp, $photo_filename, $id]);
                     $msg = 'Врач обновлен';
                 } else {
+                    // Код добавления нового врача
                     $pass_hash = password_hash($_POST['password'] ?? '123456', PASSWORD_DEFAULT);
                     $pdo->prepare("INSERT INTO users (full_name, phone_number, email, specialty_id, experience_years, photo, password_hash, role) VALUES (?,?,?,?,?,?,?,'doctor')")
                         ->execute([$full_name, $phone, $email, $specialty_id, $exp, $photo_filename, $pass_hash]);
@@ -73,7 +74,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_POST['specialty_id'] ?: null
             ];
 
-            if (isset($_POST['edit_service']) && !empty($_POST['service_id'])) {
+            // ИЗМЕНЕНО: Проверяем наличие service_id
+            if (!empty($_POST['service_id'])) {
                 $data[] = (int)$_POST['service_id'];
                 $pdo->prepare("UPDATE services SET name=?, duration_minutes=?, price=?, specialty_id=? WHERE id=?")
                     ->execute($data);
@@ -86,10 +88,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (isset($_POST['delete_service'])) {
             $pdo->prepare("DELETE FROM services WHERE id = ?")->execute([(int)$_POST['service_id']]);
             $msg = 'Услуга удалена';
-        }
-
-        elseif (isset($_POST['add_specialty']) || isset($_POST['edit_specialty'])) {
-            if (isset($_POST['edit_specialty']) && !empty($_POST['specialty_id'])) {
+        } elseif (isset($_POST['add_specialty']) || isset($_POST['edit_specialty'])) {
+            // ИЗМЕНЕНО: Проверяем наличие specialty_id
+            if (!empty($_POST['specialty_id'])) {
                 $pdo->prepare("UPDATE specialties SET name=? WHERE id=?")
                     ->execute([$_POST['name'], (int)$_POST['specialty_id']]);
                 $msg = 'Специальность обновлена';
@@ -129,7 +130,7 @@ switch ($active_tab) {
         break;
 
     case 'doctors':
-                $stmt = $pdo->prepare("
+        $stmt = $pdo->prepare("
             SELECT u.id, u.full_name, u.phone_number, u.email, u.experience_years, u.photo, s.name as specialty_name
             FROM users u
             LEFT JOIN specialties s ON u.specialty_id = s.id
@@ -166,7 +167,7 @@ switch ($active_tab) {
         break;
 
     case 'patients':
-                $stmt = $pdo->prepare("
+        $stmt = $pdo->prepare("
             SELECT u.id, u.full_name, u.email, COUNT(a.id) as appointments_count
             FROM users u
             LEFT JOIN appointments a ON u.id = a.patient_id
@@ -234,7 +235,7 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
                 echo $titles[$active_tab] ?? 'Админ-панель';
                 ?>
             </h1>
-            <?php if ($active_tab !== 'patients'): ?>
+            <?php if ($active_tab !== 'patients' && $active_tab !== 'appointments'): ?>
                 <button class="btn-add" onclick="openModal()">+ Добавить</button>
             <?php endif; ?>
         </div>
@@ -424,7 +425,7 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
                 <input type="hidden" name="doctor_id" id="doctor_id">
                 <div class="form-group"><label>ФИО:</label><input type="text" name="full_name" id="doctor_full_name" required></div>
                 <div class="form-group"><label>Телефон:</label><input type="tel" name="phone_number" id="doctor_phone" required></div>
-                <div class="form-group"><label>Email:</label><input type="email" name="email" id="doctor_email" required></div>
+                <div class="form-group"><label>Email:</label><input type="email" name="email" id="doctor_email"></div>
                 <div class="form-group"><label>Пароль (оставьте пустым при редактировании):</label><input type="password" name="password" id="doctor_password"></div>
                 <div class="form-group">
                     <label>Специальность:</label>
@@ -459,7 +460,7 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
                 <input type="hidden" name="service_id" id="service_id">
                 <div class="form-group"><label>Название:</label><input type="text" name="name" id="service_name" required></div>
                 <div class="form-group"><label>Длительность (мин):</label><input type="number" name="duration_minutes" id="service_duration" min="1" required></div>
-                <div class="form-group"><label>Цена (BUN):</label><input type="number" name="price" id="service_price" min="0" step="0.01" required></div>
+                <div class="form-group"><label>Цена:</label><input type="number" name="price" id="service_price" min="0" step="0.01" required></div>
                 <div class="form-group">
                     <label>Специальность:</label>
                     <select name="specialty_id" id="service_specialty_id">
