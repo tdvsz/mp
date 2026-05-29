@@ -569,7 +569,7 @@ if ($role === 'doctor') {
 ")->fetchAll(PDO::FETCH_KEY_PAIR);
 
                 $labels = json_encode(array_map(function ($d) {
-                    return date('d.m', strtotime($d));
+                    return date('d.m.Y', strtotime($d));
                 }, array_keys($chart_data)));
                 $values = json_encode(array_values($chart_data));
                 ?>

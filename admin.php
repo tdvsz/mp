@@ -253,7 +253,7 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
                     <?php foreach ($data as $row): ?>
                         <tr>
                             <td><?= $row['id'] ?></td>
-                            <td><?= htmlspecialchars($row['appointment_date']) ?></td>
+                            <td><?= date('d.m.Y', strtotime($row['appointment_date'])) ?></td>
                             <td><?= substr($row['start_time'], 0, 5) ?></td>
                             <td><?= htmlspecialchars($row['patient_name']) ?></td>
                             <td><?= htmlspecialchars($row['doctor_name']) ?></td>
