@@ -13,7 +13,6 @@ $where = "WHERE u.role = 'doctor'";
 $params = [];
 
 if ($search !== '') {
-    // Ищем по имени врача или названию специальности через JOIN
     $where .= " AND (u.full_name LIKE ? OR sp.name LIKE ?)";
     $params[] = "%$search%";
     $params[] = "%$search%";
@@ -31,7 +30,6 @@ try {
     $total = $countStmt->fetchColumn();
     $totalPages = ceil($total / $limit);
 
-    // Выборка врачей с JOIN к specialties
     $stmt = $pdo->prepare("
         SELECT u.id, u.full_name, u.specialty_id, u.experience_years, u.photo, sp.name as specialty_name
         FROM users u 
@@ -42,7 +40,6 @@ try {
     $stmt->execute($params);
     $doctors = $stmt->fetchAll();
 
-    // Получаем список специальностей для фильтра
     $specs = $pdo->query("SELECT id, name FROM specialties ORDER BY name")->fetchAll();
 } catch (PDOException $e) {
     die("Ошибка БД: " . $e->getMessage());

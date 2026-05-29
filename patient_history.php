@@ -1,6 +1,6 @@
 <?php
 require 'config.php';
-requireAuth(['doctor']); // Доступ только врачам
+requireAuth(['doctor']);
 
 $doc_id = $_SESSION['user_id'];
 $patient_id = (int)($_GET['patient_id'] ?? 0);
@@ -96,9 +96,7 @@ $history = $stmt->fetchAll();
             <div class="pp-info">
                 <h1><?= htmlspecialchars($patient['full_name']) ?></h1>
                 <?php if (!empty($patient['email'])): ?>
-                    <p class="email-link">📧 Email: <a href="mailto:<?= htmlspecialchars($patient['email']) ?>"><?= htmlspecialchars($patient['email']) ?></a></p>
-                <?php else: ?>
-                    <p class="tg-link" style="opacity:0.5">Telegram не указан</p>
+                    <p class="email-link">Email: <a href="mailto:<?= htmlspecialchars($patient['email']) ?>"><?= htmlspecialchars($patient['email']) ?></a></p>
                 <?php endif; ?>
             </div>
         </div>

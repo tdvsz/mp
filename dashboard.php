@@ -6,7 +6,6 @@ $role = $_SESSION['role'];
 $user_id = $_SESSION['user_id'];
 $name = htmlspecialchars($_SESSION['full_name']);
 
-// === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ РУССКИХ ДАТ ===
 function ru_month($month_num)
 {
     $months = [
@@ -30,7 +29,6 @@ function format_date_ru($date)
 {
     return $date ? date('d.m.Y', strtotime($date)) : '';
 }
-// ===============================================
 
 $success_msg = '';
 $err_msg = '';
@@ -50,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// ==================== ПАЦИЕНТ ====================
+// ПАЦИЕНТ
 $patient_upcoming = [];
 $patient_history = [];
 $patient_history_params = [];
@@ -105,7 +103,7 @@ if ($role === 'patient') {
     $patient_history = $ph->fetchAll();
 }
 
-// ==================== ВРАЧ ====================
+// ВРАЧ
 $doctor_today = [];
 $doctor_future = [];
 
@@ -168,7 +166,7 @@ if ($role === 'doctor') {
             </div>
         </div>
 
-        <!-- ================= ПАЦИЕНТ ================= -->
+        <!-- ПАЦИЕНТ-->
         <?php if ($role === 'patient'): ?>
             <h2 style="margin:30px 0 15px; color:var(--primary);">Предстоящие приемы</h2>
             <?php if (empty($patient_upcoming)): ?>
@@ -190,14 +188,14 @@ if ($role === 'doctor') {
                                 <p class="ap-doctor"><?= htmlspecialchars($ap['doctor_name']) ?></p>
                                 <p class="ap-time"><?= substr($ap['start_time'], 0, 5) ?> • <?= $ap['duration_minutes'] ?> мин</p>
                                 <?php if (!empty($ap['doctor_email'])): ?>
-                                    <p class="ap-email">📧 Email: <a href="mailto:<?= htmlspecialchars($ap['doctor_email']) ?>"><?= htmlspecialchars($ap['doctor_email']) ?></a></p>
+                                    <p class="ap-email">Email: <a href="mailto:<?= htmlspecialchars($ap['doctor_email']) ?>"><?= htmlspecialchars($ap['doctor_email']) ?></a></p>
                                 <?php endif; ?>
                             </div>
                             <div class="ap-price"><?= number_format($ap['price'], 0, ',', ' ') ?> BUN</div>
                             <div class="ap-actions">
                                 <form method="POST" onsubmit="return confirm('Отменить эту запись?')">
                                     <input type="hidden" name="ap_id" value="<?= $ap['id'] ?>">
-                                    <button type="submit" name="cancel_appointment" class="btn-cancel">✖ Отменить</button>
+                                    <button type="submit" name="cancel_appointment" class="btn-cancel">Отменить</button>
                                 </form>
                             </div>
                         </div>
@@ -277,7 +275,7 @@ if ($role === 'doctor') {
                 <?php endif; ?>
             <?php endif; ?>
 
-            <!-- ================= ВРАЧ ================= -->
+            <!-- ВРАЧ -->
         <?php elseif ($role === 'doctor'): ?>
 
             <h2 style="margin:0 0 15px; color:#10b981;">Приемы на сегодня</h2>
@@ -495,19 +493,19 @@ if ($role === 'doctor') {
             <!-- Быстрые действия -->
             <div class="quick-actions">
                 <a href="admin.php?tab=appointments" class="quick-action-btn">
-                    <span class="quick-action-icon">📅</span>
+                    <span class="quick-action-icon"></span>
                     <span class="quick-action-text">Управление записями</span>
                 </a>
                 <a href="admin.php?tab=doctors" class="quick-action-btn secondary">
-                    <span class="quick-action-icon">👨‍⚕️</span>
+                    <span class="quick-action-icon">️</span>
                     <span class="quick-action-text">Врачи</span>
                 </a>
                 <a href="admin.php?tab=services" class="quick-action-btn tertiary">
-                    <span class="quick-action-icon">🏥</span>
+                    <span class="quick-action-icon"></span>
                     <span class="quick-action-text">Услуги</span>
                 </a>
                 <a href="admin.php?tab=patients" class="quick-action-btn quaternary">
-                    <span class="quick-action-icon">👥</span>
+                    <span class="quick-action-icon"></span>
                     <span class="quick-action-text">Пациенты</span>
                 </a>
             </div>
@@ -515,7 +513,7 @@ if ($role === 'doctor') {
             <div class="dashboard-grid">
                 <!-- Последние записи -->
                 <div class="dashboard-card">
-                    <h3>🕐 Последние записи</h3>
+                    <h3>Последние записи</h3>
                     <?php if (empty($recent_appointments)): ?>
                         <p style="color: #64748b; text-align: center; padding: 20px;">Нет записей</p>
                     <?php else: ?>
@@ -535,7 +533,7 @@ if ($role === 'doctor') {
 
                 <!-- Топ врачей -->
                 <div class="dashboard-card">
-                    <h3>🏆 Топ врачей по записям</h3>
+                    <h3>Топ врачей по записям</h3>
                     <?php if (empty($top_doctors)): ?>
                         <p style="color: #64748b; text-align: center; padding: 20px;">Нет данных</p>
                     <?php else: ?>
@@ -553,7 +551,7 @@ if ($role === 'doctor') {
 
             <!-- График -->
             <div class="dashboard-card" style="margin-top: 20px;">
-                <h3>📈 Активность за последние 7 дней</h3>
+                <h3>Активность за последние 7 дней</h3>
                 <canvas id="activityChart" height="200"></canvas>
             </div>
 

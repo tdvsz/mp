@@ -36,7 +36,6 @@
     font-size: 0.9rem;
 }
 
-/* Стили для белорусского номера */
 .phone-group {
     display: flex;
     align-items: center;
@@ -72,7 +71,6 @@
     background: transparent;
 }
 
-/* Основные инпуты (переопределение) */
 .auth-card input[type="text"],
 .auth-card input[type="email"],
 .auth-card input[type="password"] {
@@ -119,7 +117,6 @@
     text-decoration: underline;
 }
 
-/* Анимация появления полей регистрации */
 #register-fields {
     animation: fadeInDown 0.3s ease;
 }

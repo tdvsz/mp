@@ -6,7 +6,6 @@
 <div id="toast-container"></div>
 
 <script>
-    // Toast Notification System
     const Toast = {
         defaultDuration: 5000,
 
@@ -42,10 +41,8 @@
 
             container.appendChild(toast);
 
-            // Timer ID для управления
             let hideTimer;
 
-            // Функция скрытия
             const hide = () => {
                 toast.classList.add('hiding');
                 setTimeout(() => {
@@ -55,24 +52,20 @@
                 }, 400);
             };
 
-            // Запуск таймера
             const startTimer = () => {
                 const toastDuration = duration || this.defaultDuration;
                 hideTimer = setTimeout(hide, toastDuration);
             };
 
-            // Остановка таймера
             const stopTimer = () => {
                 if (hideTimer) {
                     clearTimeout(hideTimer);
                 }
             };
 
-            // Hover события - пауза при наведении
             toast.addEventListener('mouseenter', stopTimer);
             toast.addEventListener('mouseleave', startTimer);
 
-            // Запускаем таймер
             startTimer();
         },
 
@@ -104,12 +97,10 @@
         }
     };
 
-    // Обратная совместимость со старой функцией showToast
     function showToast(message, type = 'success', title = null) {
         Toast.show(message, type, title);
     }
 
-    // Показ тостов из PHP-переменных (если есть)
     <?php if (isset($msg) && $msg): ?>
         Toast.show(<?= json_encode($msg) ?>, 'success');
     <?php endif; ?>

@@ -16,7 +16,6 @@ $err = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        // === ЗАПИСИ ===
         if (isset($_POST['update_appointment_status'])) {
             $pdo->prepare("UPDATE appointments SET status = ? WHERE id = ?")
                 ->execute([$_POST['status'], (int)$_POST['ap_id']]);
@@ -26,9 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $msg = 'Запись удалена';
         }
 
-        // === ВРАЧИ ===
         elseif (isset($_POST['add_doctor']) || isset($_POST['edit_doctor'])) {
-            // Определяем старое фото (для редактирования)
             $photo_filename = null;
             if (!empty($_POST['doctor_id'])) {
                 $stmt_old = $pdo->prepare("SELECT photo FROM users WHERE id = ?");
@@ -53,7 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ->execute([$full_name, $phone, $email, $specialty_id, $exp, $photo_filename, $id]);
                     $msg = 'Врач обновлен';
                 } else {
-                    // Код добавления нового врача
                     $pass_hash = password_hash($_POST['password'] ?? '123456', PASSWORD_DEFAULT);
                     $pdo->prepare("INSERT INTO users (full_name, phone_number, email, specialty_id, experience_years, photo, password_hash, role) VALUES (?,?,?,?,?,?,?,'doctor')")
                         ->execute([$full_name, $phone, $email, $specialty_id, $exp, $photo_filename, $pass_hash]);
@@ -65,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $msg = 'Врач удален';
         }
 
-        // === УСЛУГИ ===
+
         elseif (isset($_POST['add_service']) || isset($_POST['edit_service'])) {
             $data = [
                 $_POST['name'],
@@ -74,7 +70,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_POST['specialty_id'] ?: null
             ];
 
-            // ИЗМЕНЕНО: Проверяем наличие service_id
             if (!empty($_POST['service_id'])) {
                 $data[] = (int)$_POST['service_id'];
                 $pdo->prepare("UPDATE services SET name=?, duration_minutes=?, price=?, specialty_id=? WHERE id=?")
@@ -89,7 +84,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->prepare("DELETE FROM services WHERE id = ?")->execute([(int)$_POST['service_id']]);
             $msg = 'Услуга удалена';
         } elseif (isset($_POST['add_specialty']) || isset($_POST['edit_specialty'])) {
-            // ИЗМЕНЕНО: Проверяем наличие specialty_id
             if (!empty($_POST['specialty_id'])) {
                 $pdo->prepare("UPDATE specialties SET name=? WHERE id=?")
                     ->execute([$_POST['name'], (int)$_POST['specialty_id']]);
@@ -185,7 +179,6 @@ switch ($active_tab) {
 
 $total_pages = ceil($total / $limit);
 
-// Данные для форм
 $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetchAll();
 ?>
 <!DOCTYPE html>

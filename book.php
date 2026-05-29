@@ -16,7 +16,7 @@ $stmt->execute([$doctor_id]);
 $doctor = $stmt->fetch();
 if (!$doctor) redirect('doctors.php');
 
-// 2. Услуги (общие + профильные для этого врача)
+// 2. Услуги
 $stmt = $pdo->prepare("
     SELECT s.* FROM services s 
     LEFT JOIN specialties sp ON s.specialty_id = sp.id
@@ -122,7 +122,7 @@ if ($selected_date && $selected_service) {
     }
 }
 
-// 6. Обработка бронирования (POST)
+// 6. Обработка бронирования
 $msg = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $srv = (int)$_POST['service_id'];
@@ -137,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $check->execute([$doctor_id, $d, "$time:00"]);
 
     if ($check->fetch()) {
-        $msg = '❌ Время только что заняли. Выберите другое.';
+        $msg = 'Время только что заняли. Выберите другое.';
     } else {
         $pdo->prepare("INSERT INTO appointments (patient_id, doctor_id, service_id, appointment_date, start_time, price) VALUES (?,?,?,?,?,?)")
             ->execute([$_SESSION['user_id'], $doctor_id, $srv, $d, "$time:00", $price]);
@@ -319,18 +319,15 @@ function build_calendar($pdo, $doc_id, $srv_id, $month_str, $active_date)
 
     <script>
         function selectService(serviceId) {
-            // Убираем выделение со всех услуг
             document.querySelectorAll('.service-item').forEach(item => {
                 item.classList.remove('selected');
             });
 
-            // Добавляем выделение выбранной услуге
             const selectedItem = document.querySelector(`.service-item[data-service-id="${serviceId}"]`);
             if (selectedItem) {
                 selectedItem.classList.add('selected');
             }
-
-            // Обновляем hidden input и отправляем форму
+            
             document.getElementById('service_id').value = serviceId;
             document.getElementById('filterForm').submit();
         }

@@ -4,7 +4,6 @@ requireAuth(['doctor']);
 
 $doc_id = $_SESSION['user_id'];
 
-// Проверяем и добавляем поле description в таблицу users, если его нет
 try {
     $pdo->query("SELECT description FROM users LIMIT 1");
 } catch (PDOException $e) {
@@ -29,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_description'])) 
     $doctor_info['description'] = $description;
 }
 
-// Получаем услуги для расписания (для карточек)
+// Получаем услуги для расписания
 $services = $pdo->prepare("
     SELECT s.* FROM services s 
     LEFT JOIN specialties sp ON s.specialty_id = sp.id
@@ -91,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Получаем расписание для вкладки "Расписание"
+// Получаем расписание для вкладки Расписание
 $schedule = $pdo->prepare("
     SELECT s.*, srv.name as service_name, srv.duration_minutes
     FROM doctor_schedule_slots s 
@@ -215,7 +214,6 @@ $total_minutes = $total_hours * 60;
                         </div>
                     </div>
 
-                    <!-- Карточки услуг вместо select -->
                     <!-- Карточки услуг + карточка перерыва -->
                     <div class="form-group">
                         <label>Услуга или перерыв:</label>
@@ -265,30 +263,28 @@ $total_minutes = $total_hours * 60;
     <script>
         // Функции для управления карточками услуг
         function selectService(serviceId, isBreak) {
-            // Убираем выделение со всех
             document.querySelectorAll('.service-item').forEach(item => {
                 item.classList.remove('selected');
             });
-            // Выделяем выбранную
+
             const selectedItem = document.querySelector(`.service-item[data-service-id="${serviceId}"]`);
             if (selectedItem) selectedItem.classList.add('selected');
 
-            // Устанавливаем значения
+
             document.getElementById('service_id').value = serviceId;
             document.getElementById('is_break').value = isBreak;
         }
 
         // Выбор перерыва
         function selectBreak() {
-            // Убираем выделение со всех
             document.querySelectorAll('.service-item').forEach(item => {
                 item.classList.remove('selected');
             });
-            // Выделяем карточку перерыва
+
             const breakItem = document.querySelector('.break-item');
             if (breakItem) breakItem.classList.add('selected');
 
-            // Устанавливаем значения
+
             document.getElementById('service_id').value = '';
             document.getElementById('is_break').value = '1';
         }
@@ -323,15 +319,13 @@ $total_minutes = $total_hours * 60;
             });
         }
 
-        // Сброс формы
         function resetForm() {
             document.getElementById('slotFormInner').reset();
             document.getElementById('edit_id').value = '';
             document.getElementById('service_id').value = '';
             document.getElementById('is_break').value = '0';
-            // Снимаем выделение со всех карточек
+
             document.querySelectorAll('.service-item').forEach(item => item.classList.remove('selected'));
-            // Меняем кнопку обратно на добавление
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.name = 'add_slot';
             submitBtn.textContent = 'Сохранить слот';
@@ -344,17 +338,14 @@ $total_minutes = $total_hours * 60;
             document.getElementById('start_time').value = slot.start_time;
             document.getElementById('end_time').value = slot.end_time;
 
-            // Снимаем выделение со всех
             document.querySelectorAll('.service-item').forEach(item => item.classList.remove('selected'));
 
             if (slot.is_break == 1) {
-                // Перерыв
                 document.getElementById('service_id').value = '';
                 document.getElementById('is_break').value = '1';
                 const breakItem = document.querySelector('.break-item');
                 if (breakItem) breakItem.classList.add('selected');
             } else {
-                // Обычная услуга
                 document.getElementById('service_id').value = slot.service_id || '';
                 document.getElementById('is_break').value = '0';
                 if (slot.service_id) {
@@ -363,7 +354,6 @@ $total_minutes = $total_hours * 60;
                 }
             }
 
-            // Меняем кнопку на "Обновить"
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.name = 'edit_slot';
             submitBtn.textContent = 'Обновить слот';

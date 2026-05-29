@@ -30,22 +30,22 @@
                 <h2>Почему выбирают Medprofi</h2>
                 <div class="adv-grid">
                     <div class="adv-card">
-                        <div class="icon">🩺</div>
+                        <div class="icon"></div>
                         <h3>Опытные врачи</h3>
                         <p>Сертифицированные специалисты с клиническим стажем от 5 лет</p>
                     </div>
                     <div class="adv-card">
-                        <div class="icon">⏱</div>
+                        <div class="icon"></div>
                         <h3>Точное время</h3>
                         <p>Приходите к назначенному часу. Никаких ожиданий в очередях</p>
                     </div>
                     <div class="adv-card">
-                        <div class="icon">💻</div>
+                        <div class="icon"></div>
                         <h3>Личный кабинет</h3>
                         <p>Управляйте записями, историей посещений и результатами онлайн</p>
                     </div>
                     <div class="adv-card">
-                        <div class="icon">🔒</div>
+                        <div class="icon"></div>
                         <h3>Конфиденциальность</h3>
                         <p>Защищённые данные и соблюдение врачебной этики</p>
                     </div>
@@ -55,7 +55,7 @@
     </main>
 
     <footer class="site-footer">
-        <div class="container">© 2026 Medprofi. Все права защищены. | г. Москва, ул. Примерная, 10</div>
+        <div class="container">© 2026 Medprofi.</div>
     </footer>
     <?php require 'toast.php'; ?>
 </body>

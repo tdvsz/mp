@@ -292,7 +292,7 @@ select:focus {
     border-radius: 12px;
 }
 
-/* Утилиты (взамен инлайн-стилей) */
+/* Утилиты */
 .inline-form {
     display: inline;
 }
@@ -341,7 +341,6 @@ select:focus {
     align-items: center;
 }
 
-/* Кнопка "Назад" в хедере */
 .btn-back {
     display: inline-flex;
     align-items: center;
@@ -362,7 +361,6 @@ select:focus {
     border-color: #cbd5e1;
 }
 
-/* Контейнер для левой части хедера */
 .header-left {
     display: flex;
     align-items: center;

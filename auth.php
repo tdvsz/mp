@@ -4,7 +4,7 @@ $err = $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'];
-    $phone = trim($_POST['phone']); // Данные приходят из скрытого поля (уже в виде +375XXXXXXXXX)
+    $phone = trim($_POST['phone']);
     $pass = $_POST['password'];
 
     if ($action === 'register') {
@@ -47,10 +47,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Запоминание состояния (чтобы при ошибке оставаться на вкладке регистрации, если юзер регистрировался)
+// Запоминание состояния
 $is_register = (isset($_POST['action']) && $_POST['action'] === 'register' && !$success);
 
-// Обратное преобразование телефона для показа в поле после неудачной попытки (без +375)
 $posted_phone = $_POST['phone'] ?? '';
 $phone_tail = '';
 if (strpos($posted_phone, '+375') === 0) {
@@ -147,14 +146,10 @@ if (strpos($posted_phone, '+375') === 0) {
             }
         }
 
-        // Форматирование телефона на лету
         function formatPhone(input) {
-            // Оставляем только цифры
             let val = input.value.replace(/\D/g, '');
-            // Ограничиваем длину 9 цифрами (т.к. код +375 у нас снаружи)
             if (val.length > 9) val = val.substring(0, 9);
 
-            // Визуальное форматирование (XX XXX XX XX)
             let formatted = val;
             if (val.length > 2) formatted = val.substring(0, 2) + ' ' + val.substring(2);
             if (val.length > 5) formatted = formatted.substring(0, 6) + ' ' + formatted.substring(6);
@@ -162,14 +157,11 @@ if (strpos($posted_phone, '+375') === 0) {
 
             input.value = formatted;
 
-            // Запись полноценного номера в скрытое поле для отправки на сервер
             document.getElementById('full_phone').value = val.length > 0 ? '+375' + val : '';
         }
 
-        // Подготовка перед отправкой (валидация на клиенте)
         function prepareForm() {
             const fullPhone = document.getElementById('full_phone').value;
-            // Длина должна быть 13 символов (+375 и 9 цифр)
             if (fullPhone.length !== 13) {
                 if (typeof Toast !== 'undefined') Toast.error('Введите номер телефона полностью (9 цифр)');
                 else alert('Введите номер телефона полностью (9 цифр)');
@@ -178,7 +170,6 @@ if (strpos($posted_phone, '+375') === 0) {
             return true;
         }
 
-        // Принудительно отформатируем поле при загрузке (если браузер автозаполнил)
         document.addEventListener("DOMContentLoaded", () => {
             const phoneInput = document.getElementById('phone_input');
             if (phoneInput.value) formatPhone(phoneInput);
