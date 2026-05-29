@@ -340,3 +340,31 @@ select:focus {
     gap: 10px;
     align-items: center;
 }
+
+/* Кнопка "Назад" в хедере */
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    font-size: 0.9rem;
+    background: #f1f5f9;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.btn-back:hover {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+}
+
+/* Контейнер для левой части хедера */
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}

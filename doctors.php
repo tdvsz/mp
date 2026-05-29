@@ -61,11 +61,14 @@ try {
 <body>
     <header class="site-header">
         <div class="container header-flex">
-            <a href="index.php" class="logo">Medprofi</a>
-            <nav>
-                <a href="dashboard.php" class="btn btn-outline">Мои записи</a>
+            <div class="header-left">
+                <a href="dashboard.php" class="btn-back">← В кабинет</a>
+                <a href="dashboard.php" class="logo">Medprofi <span class="badge">Пациент</span></a>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <a href="settings.php" class="btn btn-outline">Настройки</a>
                 <a href="logout.php" class="btn btn-outline">Выйти</a>
-            </nav>
+            </div>
         </div>
     </header>
 

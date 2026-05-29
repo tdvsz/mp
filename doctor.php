@@ -124,8 +124,11 @@ $total_minutes = $total_hours * 60;
 <body>
     <header class="site-header">
         <div class="container header-flex">
-            <a href="dashboard.php" class="logo">← В кабинет</a>
-            <div style="display:flex; gap:10px;">
+            <div class="header-left">
+                <a href="dashboard.php" class="btn-back">← В кабинет</a>
+                <a href="dashboard.php" class="logo">Medprofi <span class="badge">Врач</span></a>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
                 <a href="settings.php" class="btn btn-outline">Настройки</a>
                 <a href="logout.php" class="btn btn-outline">Выйти</a>
             </div>

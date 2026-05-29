@@ -201,8 +201,14 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
 <body>
     <header class="site-header">
         <div class="container header-flex">
-            <a href="index.php" class="logo">Medprofi Admin</a>
-            <a href="index.php" class="btn btn-outline">← На сайт</a>
+            <div class="header-left">
+                <a href="dashboard.php" class="btn-back">← В кабинет</a>
+                <a href="dashboard.php" class="logo">Medprofi <span class="badge">Админ</span></a>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <a href="settings.php" class="btn btn-outline">Настройки</a>
+                <a href="logout.php" class="btn btn-outline">Выйти</a>
+            </div>
         </div>
     </header>
 

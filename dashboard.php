@@ -144,7 +144,9 @@ if ($role === 'doctor') {
 <body>
     <header class="site-header">
         <div class="container header-flex">
-            <div class="logo">Medprofi <span class="badge"><?= ($role === 'patient' ? 'Пациент' : ($role === 'doctor' ? 'Врач' : 'Админ')) ?></span></div>
+            <div class="header-left">
+                <a href="dashboard.php" class="logo">Medprofi <span class="badge"><?= ($_SESSION['role'] === 'patient' ? 'Пациент' : ($_SESSION['role'] === 'doctor' ? 'Врач' : 'Админ')) ?></span></a>
+            </div>
             <div style="display:flex; gap:10px; align-items:center;">
                 <a href="settings.php" class="btn btn-outline">Настройки</a>
                 <a href="logout.php" class="btn btn-outline">Выйти</a>

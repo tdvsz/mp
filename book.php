@@ -215,8 +215,14 @@ function build_calendar($pdo, $doc_id, $srv_id, $month_str, $active_date)
 <body>
     <header class="site-header">
         <div class="container header-flex">
-            <a href="doctors.php" class="logo">← Врачи</a>
-            <a href="logout.php" class="btn btn-outline">Выйти</a>
+            <div class="header-left">
+                <a href="doctors.php" class="btn-back">← К врачам</a>
+                <a href="dashboard.php" class="logo">Medprofi <span class="badge">Пациент</span></a>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <a href="settings.php" class="btn btn-outline">Настройки</a>
+                <a href="logout.php" class="btn btn-outline">Выйти</a>
+            </div>
         </div>
     </header>
 

@@ -81,8 +81,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <header class="site-header">
         <div class="container header-flex">
-            <a href="dashboard.php" class="logo">← Кабинет</a>
-            <a href="logout.php" class="btn btn-outline">Выйти</a>
+            <div class="header-left">
+                <a href="dashboard.php" class="btn-back">← В кабинет</a>
+                <a href="dashboard.php" class="logo">Medprofi <span class="badge"><?= ($_SESSION['role'] === 'patient' ? 'Пациент' : ($_SESSION['role'] === 'doctor' ? 'Врач' : 'Админ')) ?></span></a>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <a href="logout.php" class="btn btn-outline">Выйти</a>
+            </div>
         </div>
     </header>
 
