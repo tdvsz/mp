@@ -81,11 +81,11 @@ if (strpos($posted_phone, '+375') === 0) {
             <div id="register-fields" style="display: <?= $is_register ? 'block' : 'none' ?>;">
                 <div class="form-group">
                     <label>ФИО</label>
-                    <input type="text" name="full_name" id="name-field" placeholder="Иванов Иван Иванович" value="<?= htmlspecialchars($_POST['full_name'] ?? '') ?>" <?= $is_register ? 'required' : '' ?>>
+                    <input type="text" name="full_name" id="name-field" value="<?= htmlspecialchars($_POST['full_name'] ?? '') ?>" <?= $is_register ? 'required' : '' ?>>
                 </div>
                 <div class="form-group">
                     <label>Email (для уведомлений)</label>
-                    <input type="email" name="email" id="email-field" placeholder="example@mail.com" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
+                    <input type="email" name="email" id="email-field" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
                 </div>
             </div>
 

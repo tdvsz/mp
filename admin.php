@@ -23,9 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (isset($_POST['delete_appointment'])) {
             $pdo->prepare("DELETE FROM appointments WHERE id = ?")->execute([(int)$_POST['ap_id']]);
             $msg = 'Запись удалена';
-        }
-
-        elseif (isset($_POST['add_doctor']) || isset($_POST['edit_doctor'])) {
+        } elseif (isset($_POST['add_doctor']) || isset($_POST['edit_doctor'])) {
             $photo_filename = null;
             if (!empty($_POST['doctor_id'])) {
                 $stmt_old = $pdo->prepare("SELECT photo FROM users WHERE id = ?");
@@ -59,10 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (isset($_POST['delete_doctor'])) {
             $pdo->prepare("DELETE FROM users WHERE id = ? AND role='doctor'")->execute([(int)$_POST['doctor_id']]);
             $msg = 'Врач удален';
-        }
-
-
-        elseif (isset($_POST['add_service']) || isset($_POST['edit_service'])) {
+        } elseif (isset($_POST['add_service']) || isset($_POST['edit_service'])) {
             $data = [
                 $_POST['name'],
                 (int)$_POST['duration_minutes'],
@@ -102,81 +97,100 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Получение данных для таблиц
+$search = trim($_GET['search'] ?? '');
+$search_param = "%{$search}%";
+
 $data = [];
 $total = 0;
 
 switch ($active_tab) {
     case 'appointments':
+        $where = $search ? "WHERE p.full_name LIKE ? OR d.full_name LIKE ? OR s.name LIKE ?" : "";
         $stmt = $pdo->prepare("
             SELECT a.*, p.full_name as patient_name, d.full_name as doctor_name, s.name as service_name
             FROM appointments a
             JOIN users p ON a.patient_id = p.id
             JOIN users d ON a.doctor_id = d.id
             JOIN services s ON a.service_id = s.id
+            $where
             ORDER BY a.appointment_date DESC, a.start_time DESC
-            LIMIT ? OFFSET ?
-        ");
-        $stmt->execute([$limit, $offset]);
+            LIMIT ? OFFSET ?");
+        $params = $search ? [$search_param, $search_param, $search_param, $limit, $offset] : [$limit, $offset];
+        $stmt->execute($params);
         $data = $stmt->fetchAll();
 
-        $total = $pdo->query("SELECT COUNT(*) FROM appointments")->fetchColumn();
+        $stmt_total = $pdo->prepare("SELECT COUNT(*) FROM appointments a JOIN users p ON a.patient_id = p.id JOIN users d ON a.doctor_id = d.id JOIN services s ON a.service_id = s.id $where");
+        $stmt_total->execute($search ? [$search_param, $search_param, $search_param] : []);
+        $total = $stmt_total->fetchColumn();
         break;
 
     case 'doctors':
+        $where = $search ? "AND (u.full_name LIKE ? OR u.phone_number LIKE ? OR u.email LIKE ? OR s.name LIKE ?)" : "";
         $stmt = $pdo->prepare("
             SELECT u.id, u.full_name, u.phone_number, u.email, u.experience_years, u.photo, s.name as specialty_name
             FROM users u
             LEFT JOIN specialties s ON u.specialty_id = s.id
-            WHERE u.role = 'doctor'
+            WHERE u.role = 'doctor' $where
             ORDER BY u.full_name
-            LIMIT ? OFFSET ?
-        ");
-        $stmt->execute([$limit, $offset]);
+            LIMIT ? OFFSET ?");
+        $params = $search ? [$search_param, $search_param, $search_param, $search_param, $limit, $offset] : [$limit, $offset];
+        $stmt->execute($params);
         $data = $stmt->fetchAll();
 
-        $total = $pdo->query("SELECT COUNT(*) FROM users WHERE role='doctor'")->fetchColumn();
+        $stmt_total = $pdo->prepare("SELECT COUNT(*) FROM users u LEFT JOIN specialties s ON u.specialty_id = s.id WHERE u.role = 'doctor' $where");
+        $stmt_total->execute($search ? [$search_param, $search_param, $search_param, $search_param] : []);
+        $total = $stmt_total->fetchColumn();
         break;
 
     case 'services':
+        $where = $search ? "WHERE s.name LIKE ? OR sp.name LIKE ?" : "";
         $stmt = $pdo->prepare("
             SELECT s.*, sp.name as specialty_name
             FROM services s
             LEFT JOIN specialties sp ON s.specialty_id = sp.id
+            $where
             ORDER BY s.name
-            LIMIT ? OFFSET ?
-        ");
-        $stmt->execute([$limit, $offset]);
+            LIMIT ? OFFSET ?");
+        $params = $search ? [$search_param, $search_param, $limit, $offset] : [$limit, $offset];
+        $stmt->execute($params);
         $data = $stmt->fetchAll();
 
-        $total = $pdo->query("SELECT COUNT(*) FROM services")->fetchColumn();
+        $stmt_total = $pdo->prepare("SELECT COUNT(*) FROM services s LEFT JOIN specialties sp ON s.specialty_id = sp.id $where");
+        $stmt_total->execute($search ? [$search_param, $search_param] : []);
+        $total = $stmt_total->fetchColumn();
         break;
 
     case 'specialties':
-        $stmt = $pdo->prepare("SELECT * FROM specialties ORDER BY name LIMIT ? OFFSET ?");
-        $stmt->execute([$limit, $offset]);
+        $where = $search ? "WHERE name LIKE ?" : "";
+        $stmt = $pdo->prepare("SELECT * FROM specialties $where ORDER BY name LIMIT ? OFFSET ?");
+        $params = $search ? [$search_param, $limit, $offset] : [$limit, $offset];
+        $stmt->execute($params);
         $data = $stmt->fetchAll();
 
-        $total = $pdo->query("SELECT COUNT(*) FROM specialties")->fetchColumn();
+        $stmt_total = $pdo->prepare("SELECT COUNT(*) FROM specialties $where");
+        $stmt_total->execute($search ? [$search_param] : []);
+        $total = $stmt_total->fetchColumn();
         break;
 
     case 'patients':
+        $where = $search ? "AND (u.full_name LIKE ? OR u.email LIKE ?)" : "";
         $stmt = $pdo->prepare("
             SELECT u.id, u.full_name, u.email, COUNT(a.id) as appointments_count
             FROM users u
             LEFT JOIN appointments a ON u.id = a.patient_id
-            WHERE u.role = 'patient'
+            WHERE u.role = 'patient' $where
             GROUP BY u.id
             ORDER BY u.full_name
-            LIMIT ? OFFSET ?
-        ");
-        $stmt->execute([$limit, $offset]);
+            LIMIT ? OFFSET ?");
+        $params = $search ? [$search_param, $search_param, $limit, $offset] : [$limit, $offset];
+        $stmt->execute($params);
         $data = $stmt->fetchAll();
 
-        $total = $pdo->query("SELECT COUNT(*) FROM users WHERE role='patient'")->fetchColumn();
+        $stmt_total = $pdo->prepare("SELECT COUNT(*) FROM users u LEFT JOIN appointments a ON u.id = a.patient_id WHERE u.role = 'patient' $where");
+        $stmt_total->execute($search ? [$search_param, $search_param] : []);
+        $total = $stmt_total->fetchColumn();
         break;
 }
-
 $total_pages = ceil($total / $limit);
 
 $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetchAll();
@@ -228,9 +242,20 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
                 echo $titles[$active_tab] ?? 'Админ-панель';
                 ?>
             </h1>
-            <?php if ($active_tab !== 'patients' && $active_tab !== 'appointments'): ?>
-                <button class="btn-add" onclick="openModal()">+ Добавить</button>
-            <?php endif; ?>
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <form method="GET" style="display:flex; gap:8px;">
+                    <input type="hidden" name="tab" value="<?= $active_tab ?>">
+                    <input type="text" name="search" placeholder="Поиск по таблице..." value="<?= htmlspecialchars($search) ?>"
+                        style="padding:10px 14px; border:1px solid var(--border); border-radius:8px; width:260px; font-size:0.95rem;">
+                    <button type="submit" class="btn-add" style="padding:10px 14px;">Поиск</button>
+                    <?php if ($search): ?>
+                        <a href="?tab=<?= $active_tab ?>" style="background:#f1f5f9; color:#64748b; padding:10px 12px; border-radius:8px; text-decoration:none; border:1px solid var(--border);">✖</a>
+                    <?php endif; ?>
+                </form>
+                <?php if ($active_tab !== 'patients' && $active_tab !== 'appointments'): ?>
+                    <button class="btn-add" onclick="openModal()">+ Добавить</button>
+                <?php endif; ?>
+            </div>
         </div>
 
         <!-- Таблицы -->
@@ -393,14 +418,17 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
         <!-- Пагинация -->
         <?php if ($total_pages > 1): ?>
             <div class="pagination">
+                <?php
+                $search_qs = $search ? '&search=' . urlencode($search) : '';
+                ?>
                 <?php if ($page > 1): ?>
-                    <a href="?tab=<?= $active_tab ?>&page=<?= $page - 1 ?>" class="pg-btn">←</a>
+                    <a href="?tab=<?= $active_tab ?>&page=<?= $page - 1 ?><?= $search_qs ?>" class="pg-btn">←</a>
                 <?php endif; ?>
                 <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                    <a href="?tab=<?= $active_tab ?>&page=<?= $i ?>" class="pg-btn <?= ($i == $page ? 'active' : '') ?>"><?= $i ?></a>
+                    <a href="?tab=<?= $active_tab ?>&page=<?= $i ?><?= $search_qs ?>" class="pg-btn <?= ($i == $page ? 'active' : '') ?>"><?= $i ?></a>
                 <?php endfor; ?>
                 <?php if ($page < $total_pages): ?>
-                    <a href="?tab=<?= $active_tab ?>&page=<?= $page + 1 ?>" class="pg-btn">→</a>
+                    <a href="?tab=<?= $active_tab ?>&page=<?= $page + 1 ?><?= $search_qs ?>" class="pg-btn">→</a>
                 <?php endif; ?>
             </div>
         <?php endif; ?>

@@ -497,7 +497,7 @@ if ($role === 'doctor') {
                     <span class="quick-action-text">Управление записями</span>
                 </a>
                 <a href="admin.php?tab=doctors" class="quick-action-btn secondary">
-                    <span class="quick-action-icon">️</span>
+                    <span class="quick-action-icon"></span>
                     <span class="quick-action-text">Врачи</span>
                 </a>
                 <a href="admin.php?tab=services" class="quick-action-btn tertiary">
@@ -614,5 +614,4 @@ if ($role === 'doctor') {
     </main>
     <?php require 'toast.php'; ?>
 </body>
-
 </html>
