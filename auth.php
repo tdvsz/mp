@@ -67,6 +67,7 @@ if (strpos($posted_phone, '+375') === 0) {
     <title>Авторизация | Medprofi</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="auth.css">
+    <link type="image/x-icon" href="favicon.ico" rel="shortcut icon">
 </head>
 
 <body class="auth-page">
@@ -95,7 +96,6 @@ if (strpos($posted_phone, '+375') === 0) {
                     <div class="phone-prefix">+375</div>
                     <input type="tel" id="phone_input" placeholder="29 123 45 67" required value="<?= htmlspecialchars($phone_tail) ?>" oninput="formatPhone(this)">
                 </div>
-                <!-- Реальное значение, отправляемое в PHP -->
                 <input type="hidden" name="phone" id="full_phone" value="<?= htmlspecialchars($posted_phone) ?>">
             </div>
 
@@ -119,7 +119,6 @@ if (strpos($posted_phone, '+375') === 0) {
     </div>
 
     <script>
-        // Функция переключения между Входом и Регистрацией
         function toggleAuth(e) {
             if (e) e.preventDefault();
             const action = document.getElementById('action');

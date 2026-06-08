@@ -137,6 +137,7 @@ if ($role === 'doctor') {
     <title>Кабинет | Medprofi</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="dashboard.css">
+    <link type="image/x-icon" href="favicon.ico" rel="shortcut icon">
 </head>
 
 <body>
@@ -365,7 +366,6 @@ if ($role === 'doctor') {
                 }
                 $pat_total = $pdo->prepare($pat_count_sql)->execute($pat_count_params) ? $pdo->query("SELECT COUNT(DISTINCT p.id) FROM appointments a JOIN users p ON a.patient_id = p.id WHERE a.doctor_id = " . $user_id . ($pat_search ? " AND p.full_name LIKE '%$pat_search%'" : ""))->fetchColumn() : 0;
 
-                // Исправленный подсчет
                 $count_stmt = $pdo->prepare($pat_count_sql);
                 $count_stmt->execute($pat_count_params);
                 $pat_total = $count_stmt->fetchColumn();

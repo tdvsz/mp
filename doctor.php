@@ -90,7 +90,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Получаем расписание для вкладки Расписание
 $schedule = $pdo->prepare("
     SELECT s.*, srv.name as service_name, srv.duration_minutes
     FROM doctor_schedule_slots s 
@@ -118,6 +117,7 @@ $total_minutes = $total_hours * 60;
     <title>Расписание | Medprofi</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="doctor.css">
+    <link type="image/x-icon" href="favicon.ico" rel="shortcut icon">
 </head>
 
 <body>

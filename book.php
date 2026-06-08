@@ -5,7 +5,6 @@ requireAuth(['patient']);
 $doctor_id = (int)($_GET['doctor_id'] ?? 0);
 if (!$doctor_id) redirect('doctors.php');
 
-// 1. Врач
 $stmt = $pdo->prepare("
     SELECT u.*, sp.name as specialty_name 
     FROM users u 
@@ -16,7 +15,6 @@ $stmt->execute([$doctor_id]);
 $doctor = $stmt->fetch();
 if (!$doctor) redirect('doctors.php');
 
-// 2. Услуги
 $stmt = $pdo->prepare("
     SELECT s.* FROM services s 
     LEFT JOIN specialties sp ON s.specialty_id = sp.id
@@ -26,7 +24,6 @@ $stmt = $pdo->prepare("
 $stmt->execute([$doctor['specialty_id']]);
 $services = $stmt->fetchAll();
 
-// 3. Параметры
 $service_id = (int)($_GET['service_id'] ?? 0);
 $selected_date = $_GET['date'] ?? date('Y-m-d');
 $selected_time = $_GET['time'] ?? '';
@@ -84,7 +81,7 @@ function get_free_slots($pdo, $doc_id, $date, $service_id)
     return $count;
 }
 
-// 5. Доступные слоты
+// Доступные слоты
 $available_slots = [];
 if ($selected_date && $selected_service) {
     $dow = (int)date('N', strtotime($selected_date));
@@ -122,7 +119,7 @@ if ($selected_date && $selected_service) {
     }
 }
 
-// 6. Обработка бронирования
+// Обработка бронирования
 $msg = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $srv = (int)$_POST['service_id'];
@@ -146,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 if (isset($_GET['msg']) && $_GET['msg'] === 'ok') $msg = 'Запись успешно подтверждена!';
 
-// 7. Календарь
+// Календарь
 $months = [];
 $current_month = date('Y-m');
 for ($i = 0; $i < 2; $i++) {
@@ -215,6 +212,7 @@ function build_calendar($pdo, $doc_id, $srv_id, $month_str, $active_date)
     <title>Запись | Medprofi</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="book.css">
+    <link type="image/x-icon" href="favicon.ico" rel="shortcut icon">
 </head>
 
 <body>

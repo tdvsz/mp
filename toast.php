@@ -1,5 +1,5 @@
 <?php
-// Toast Notifications Component
+// Уведомления
 ?>
 
 <link rel="stylesheet" href="toast.css">

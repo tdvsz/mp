@@ -76,6 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Настройки | Medprofi</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="settings.css">
+    <link type="image/x-icon" href="favicon.ico" rel="shortcut icon">
 </head>
 
 <body>
@@ -112,7 +113,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <div class="form-group">
                         <label>Фото профиля:</label>
-                        <!-- Показываем текущее фото, если есть -->
                         <?php if (!empty($user['photo'])): ?>
                             <div style="margin-bottom: 10px;">
                                 <img src="uploads/<?= htmlspecialchars($user['photo']) ?>"

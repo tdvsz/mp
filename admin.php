@@ -203,6 +203,7 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
     <title>Админ-панель | Medprofi</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="admin.css">
+    <link type="image/x-icon" href="favicon.ico" rel="shortcut icon">
 </head>
 
 <body>
@@ -220,7 +221,7 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
     </header>
 
     <main class="admin-content">
-        <!-- Вкладки (как в doctor.php) -->
+        <!-- Вкладки -->
         <div class="admin-tabs">
             <a href="?tab=appointments" class="admin-tab <?= ($active_tab == 'appointments' ? 'active' : '') ?>">Записи</a>
             <a href="?tab=doctors" class="admin-tab <?= ($active_tab == 'doctors' ? 'active' : '') ?>">Врачи</a>
@@ -434,8 +435,6 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
         <?php endif; ?>
     </main>
 
-    <!-- Модальные окна (без изменений) -->
-    <!-- Doctor Modal -->
     <div id="doctorModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -470,7 +469,6 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
         </div>
     </div>
 
-    <!-- Service Modal -->
     <div id="serviceModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -496,7 +494,6 @@ $specialties_list = $pdo->query("SELECT * FROM specialties ORDER BY name")->fetc
         </div>
     </div>
 
-    <!-- Specialty Modal -->
     <div id="specialtyModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">

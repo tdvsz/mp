@@ -53,6 +53,7 @@ try {
     <title>Врачи | Medprofi</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="doctors.css">
+    <link type="image/x-icon" href="favicon.ico" rel="shortcut icon">
 </head>
 
 <body>

@@ -7,7 +7,7 @@ $patient_id = (int)($_GET['patient_id'] ?? 0);
 
 if (!$patient_id) redirect('dashboard.php');
 
-// 1. Проверка: существует ли пациент и был ли он у этого врача?
+// существует ли пациент и был ли он у этого врача
 $check = $pdo->prepare("SELECT id, full_name, email, photo FROM users WHERE id = ? AND role = 'patient'");
 $check->execute([$patient_id]);
 $patient = $check->fetch();
@@ -16,7 +16,7 @@ if (!$patient) {
     die("Пациент не найден.");
 }
 
-// 2. Параметры фильтрации и сортировки
+// Параметры фильтрации и сортировки
 $date_search = $_GET['date'] ?? '';
 $status_filter = $_GET['status'] ?? '';
 $sort_by = $_GET['sort'] ?? 'date_desc'; // date_desc, date_asc, price_desc
@@ -26,7 +26,7 @@ $page = max(1, (int)($_GET['page'] ?? 1));
 $limit = 10;
 $offset = ($page - 1) * $limit;
 
-// 3. Формирование SQL запроса
+// Формирование SQL запроса
 $where = "WHERE a.patient_id = ? AND a.doctor_id = ?";
 $params = [$patient_id, $doc_id];
 
@@ -44,13 +44,13 @@ $order_sql = "ORDER BY a.appointment_date DESC, a.start_time DESC";
 if ($sort_by === 'date_asc') $order_sql = "ORDER BY a.appointment_date ASC, a.start_time ASC";
 if ($sort_by === 'price_desc') $order_sql = "ORDER BY a.price DESC";
 
-// 4. Подсчет общего количества записей для пагинации
+// Подсчет общего количества записей для пагинации
 $countStmt = $pdo->prepare("SELECT COUNT(*) FROM appointments a $where");
 $countStmt->execute($params);
 $total_records = $countStmt->fetchColumn();
 $total_pages = ceil($total_records / $limit);
 
-// 5. Получение записей
+// Получение записей
 $stmt = $pdo->prepare("
     SELECT a.id, a.appointment_date, a.start_time, a.status, a.price, a.created_at, s.name as service_name
     FROM appointments a
@@ -70,6 +70,7 @@ $history = $stmt->fetchAll();
     <title>История пациента | Medprofi</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="patient_history.css">
+    <link type="image/x-icon" href="favicon.ico" rel="shortcut icon">
 </head>
 
 <body>

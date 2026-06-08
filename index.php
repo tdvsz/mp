@@ -6,6 +6,7 @@
     <title>Medprofi — Современная клиника</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="index.css">
+    <link type="image/x-icon" href="favicon.ico" rel="shortcut icon">
 </head>
 
 <body class="landing-page">
