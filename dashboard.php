@@ -168,7 +168,7 @@ if ($role === 'doctor') {
 
         <!-- ПАЦИЕНТ-->
         <?php if ($role === 'patient'): ?>
-            <h2 style="margin:30px 0 15px; color:var(--primary);">Предстоящие приемы</h2>
+            <h2 style="margin:30px 0 15px;">Предстоящие приемы</h2>
             <?php if (empty($patient_upcoming)): ?>
                 <div class="info-box">У вас нет предстоящих записей. <a href="doctors.php" style="color:var(--primary); font-weight:600;">Записаться →</a></div>
             <?php else: ?>
@@ -205,7 +205,7 @@ if ($role === 'doctor') {
 
             <!-- ИСТОРИЯ С ФИЛЬТРАМИ -->
             <div class="history-controls">
-                <h2 style="margin:0; color:#64748b;">История посещений</h2>
+                <h2 style="margin:0;">История посещений</h2>
                 <form method="GET" class="history-filters-row">
                     <input type="hidden" name="hist_page" value="1">
                     <div class="filter-group">
@@ -278,7 +278,7 @@ if ($role === 'doctor') {
             <!-- ВРАЧ -->
         <?php elseif ($role === 'doctor'): ?>
 
-            <h2 style="margin:0 0 15px; color:#10b981;">Приемы на сегодня</h2>
+            <h2 style="margin:0 0 15px;">Приемы на сегодня</h2>
             <?php if (empty($doctor_today)): ?>
                 <div class="info-box">На сегодня записей нет.</div>
             <?php else: ?>
@@ -308,7 +308,7 @@ if ($role === 'doctor') {
                 </div>
             <?php endif; ?>
 
-            <h2 style="margin:30px 0 15px; color:#3b82f6;">Предстоящие приемы</h2>
+            <h2 style="margin:30px 0 15px;">Предстоящие приемы</h2>
             <?php if (empty($doctor_future)): ?>
                 <div class="info-box">Нет предстоящих записей.</div>
             <?php else: ?>
@@ -333,8 +333,8 @@ if ($role === 'doctor') {
             <?php endif; ?>
 
             <!-- СПИСОК ПАЦИЕНТОВ ВРАЧА -->
-            <div style="margin-top:40px; padding-top:30px; border-top:2px solid var(--border);">
-                <h2 style="margin:0 0 20px; color:#6366f1;">Мои пациенты</h2>
+            <div>
+                <h2 style="margin:30px 0 15px;">Мои пациенты</h2>
                 <?php
                 // Параметры поиска пациентов
                 $pat_search = trim($_GET['pat_search'] ?? '');
